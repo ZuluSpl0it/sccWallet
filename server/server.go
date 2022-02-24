@@ -27,8 +27,7 @@ type Session struct {
 	cachedPage    string
 }
 
-func StartHttpServer(addr string, node *node.Node, wg *sync.WaitGroup) *http.Server {
-  n = node
+func StartHttpServer(addr string, wg *sync.WaitGroup) *http.Server {
   srv = &http.Server{Addr: addr, Handler: buildHttpRoutes()}
   go func() {
     defer wg.Done()
@@ -37,6 +36,11 @@ func StartHttpServer(addr string, node *node.Node, wg *sync.WaitGroup) *http.Ser
     }
   }()
   return srv
+}
+
+func AttachNode(node *node.Node) {
+  n = node
+  srv.Handler = buildHttpRoutes()
 }
 
 // updateHeartbeat updates and returns the heartbeat time.

@@ -15,6 +15,8 @@ import (
 	"gitlab.com/scpcorp/ScPrime/node"
 )
 
+var n *node.Node
+
 // printVersionAndRevision prints the daemon's version and revision numbers.
 func printVersionAndRevision() {
 	if build.DEBUG {
@@ -49,6 +51,20 @@ func installMmapSignalHandler() {
 	}()
 }
 
+func startNode(nodeParams node.NodeParams, loadStart time.Time) {
+  node, errChan := node.New(nodeParams, loadStart) 
+  fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG ABOVE MESSAGE IS IN THE WRONG GOLANG FILE.")
+  if err := modules.PeekErr(errChan); err != nil {
+    fmt.Println("server is unable to create the ScPrime node")
+  }
+  server.AttachNode(node)
+  // Print a 'startup complete' message.
+  startupTime := time.Since(loadStart)
+  fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
+  // attach node to daemon
+  n = node
+}
+
 // installKillSignalHandler installs a signal handler for os.Interrupt, os.Kill
 // and syscall.SIGTERM and returns a channel that is closed when one of them is
 // caught.
@@ -58,7 +74,7 @@ func installKillSignalHandler() chan os.Signal {
 	return sigChan
 }
 
-// startDaemon uses the config parameters to initialize modules and start ScPrime-UI.
+// startDaemon uses the config parameters to initialize modules and start the web wallet.
 func startDaemon() (err error) {
 	// Record startup time
 	loadStart := time.Now()
@@ -76,28 +92,22 @@ func startDaemon() (err error) {
 	// configure the the node params.
 	nodeParams := configNodeParams()
 
+  // Start a node
+  go startNode(nodeParams, loadStart)
+
 	// Launch the GUI
 	go launch("http://" + nodeParams.APIaddr)
-
-	// Start a node.
-  node, errChan := node.New(nodeParams, loadStart)
-  fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG MESSAGE IS IN THE WRONG GOLANG FILE.")
-  if err := modules.PeekErr(errChan); err != nil {
-    fmt.Println("server is unable to create the ScPrime node")
-  }
-
-	// Print a 'startup complete' message.
-	startupTime := time.Since(loadStart)
-	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
 
   // Start Server
   httpServerExitDone := &sync.WaitGroup{}
   httpServerExitDone.Add(1)
-  server.StartHttpServer(nodeParams.APIaddr, node, httpServerExitDone)
+  server.StartHttpServer(nodeParams.APIaddr, httpServerExitDone)
   httpServerExitDone.Wait()
 
   // Close
-  node.Close()
+  if n != nil {
+    n.Close()
+  }
 	return nil
 }
 

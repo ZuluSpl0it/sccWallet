@@ -34,17 +34,17 @@ func configNodeParams() node.NodeParams {
 // defaultScPrimeUiDir returns the default data directory of scp-ui. The values for
 // supported operating systems are:
 //
-// Linux:   $HOME/.scprime-ui
-// MacOS:   $HOME/Library/Application Support/ScPrime-UI
-// Windows: %LOCALAPPDATA%\ScPrime-UI
+// Linux:   $HOME/.scp-webwallet
+// MacOS:   $HOME/Library/Application Support/ScPrime-WebWallet
+// Windows: %LOCALAPPDATA%\ScPrime-WebWallet
 func defaultScPrimeUiDir() string {
 	switch runtime.GOOS {
 	case "windows":
-		return filepath.Join(os.Getenv("LOCALAPPDATA"), "ScPrime-UI")
+		return filepath.Join(os.Getenv("LOCALAPPDATA"), "ScPrime-WebWallet")
 	case "darwin":
-		return filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "ScPrime-UI")
+		return filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "ScPrime-WebWallet")
 	default:
-		return filepath.Join(os.Getenv("HOME"), ".scprime-ui")
+		return filepath.Join(os.Getenv("HOME"), ".scprime-webwallet")
 	}
 }
 
