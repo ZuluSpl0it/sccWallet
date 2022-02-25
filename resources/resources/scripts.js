@@ -98,7 +98,7 @@ function shutdownNotice() {
   document.body.innerHTML = `
     <div class="col-5 left top no-wrap">
       <div>
-        <img class="scprime-logo" alt="ScPrime Wallet" src="/gui/logo.png"/>
+        <img class="scprime-logo" alt="ScPrime Web Wallet" src="/gui/logo.png"/>
       </div>
     </div>
     <div id="popup" class="popup center">

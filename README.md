@@ -12,5 +12,5 @@ To build from source, Go 1.18 or above must be installed on the system. Clone th
 git clone https://gitlab.com/scpcorp/webwallet
 cd webwallet && make
 ```
-This will install the `scp-ui` binary in your $GOPATH/bin folder (By default, this is $HOME/go/bin).
+This will install the `scp-webwallet` binary in your $GOPATH/bin folder (By default, this is $HOME/go/bin).
 

@@ -11,7 +11,7 @@
     "#1": {
       "0409": {
         "identity": {
-          "name": "scp-ui",
+          "name": "scp-webwallet",
           "version": ""
         },
         "description": "",
@@ -50,7 +50,7 @@
             "LegalTrademarks": "",
             "OriginalFilename": "",
             "PrivateBuild": "",
-            "ProductName": "scp-ui",
+            "ProductName": "scp-webwallet",
             "ProductVersion": "",
             "SpecialBuild": ""
           }
