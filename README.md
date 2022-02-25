@@ -10,7 +10,7 @@ Online documentation available at https://docs.scpri.me/software/webwallet
 Building From Source
 --------------------
 
-To build from source, [Go 1.18 or above must be installed](https://golang.org/doc/install) on the system. Clone the repo and run make:
+To build from source, [Go 1.17 or above must be installed](https://golang.org/doc/install) on the system. Clone the repo and run make:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
