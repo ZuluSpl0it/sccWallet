@@ -22,7 +22,7 @@ func die(args ...interface{}) {
 // main starts the daemon.
 func main() {
 	// Start the ScPrime web wallet daemon.
-  // the startDaemon method will only return when it is shutting down.
+	// the startDaemon method will only return when it is shutting down.
 	err := startDaemon()
 	if err != nil {
 		die(err)

@@ -1,7 +1,7 @@
 package server
 
 import (
-  "context"
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-  "gitlab.com/scpcorp/webwallet/resources"
+	"gitlab.com/scpcorp/webwallet/resources"
 
 	"gitlab.com/NebulousLabs/errors"
 
@@ -27,7 +27,7 @@ import (
 )
 
 func notFoundHandler(w http.ResponseWriter, req *http.Request) {
-  http.Error(w, "404 not found.", http.StatusNotFound)
+	http.Error(w, "404 not found.", http.StatusNotFound)
 }
 
 func redirect(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -555,7 +555,7 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	err := transactionId.UnmarshalJSON([]byte(jsonID))
 	if err != nil {
 		msg := msgPrefix + "Unable to parse transaction ID."
-	  writeError(w, msg, sessionId)
+		writeError(w, msg, sessionId)
 		return
 	}
 	txn, ok, err := n.Wallet.Transaction(transactionId)
@@ -826,7 +826,7 @@ func blockHeightHelper() (string, string, string) {
 	if err != nil {
 		fmt.Printf("Unable to determine if wallet is being scanned: %v", err)
 	}
-  synced := n.ConsensusSet.Synced()
+	synced := n.ConsensusSet.Synced()
 	if status != "" {
 		return fmtHeight, status, "yellow"
 	} else if rescanning {
@@ -994,26 +994,26 @@ func transactionHistoryHelper(sessionId string) (string, int, error) {
 // scanAddress scans a types.UnlockHash from a string.
 // copied from "gitlab.com/scpcorp/ScPrime/node/scan.go"
 func scanAddress(addrStr string) (addr types.UnlockHash, err error) {
-  err = addr.LoadString(addrStr)
-  if err != nil {
-    return types.UnlockHash{}, err
-  }
-  return addr, nil
+	err = addr.LoadString(addrStr)
+	if err != nil {
+		return types.UnlockHash{}, err
+	}
+	return addr, nil
 }
 
 // encryptionKeys enumerates the possible encryption keys that can be derived
 // from an input string.
 // copied from "gitlab.com/scpcorp/ScPrime/node/wallet.go"
 func encryptionKeys(seedStr string) (validKeys []crypto.CipherKey, seeds []modules.Seed) {
-  dicts := []mnemonics.DictionaryID{"english", "german", "japanese"}
-  for _, dict := range dicts {
-    seed, err := modules.StringToSeed(seedStr, dict)
-    if err != nil {
-      continue
-    }
-    validKeys = append(validKeys, crypto.NewWalletKey(crypto.HashObject(seed)))
-    seeds = append(seeds, seed)
-  }
-  validKeys = append(validKeys, crypto.NewWalletKey(crypto.HashObject(seedStr)))
-  return
+	dicts := []mnemonics.DictionaryID{"english", "german", "japanese"}
+	for _, dict := range dicts {
+		seed, err := modules.StringToSeed(seedStr, dict)
+		if err != nil {
+			continue
+		}
+		validKeys = append(validKeys, crypto.NewWalletKey(crypto.HashObject(seed)))
+		seeds = append(seeds, seed)
+	}
+	validKeys = append(validKeys, crypto.NewWalletKey(crypto.HashObject(seedStr)))
+	return
 }
