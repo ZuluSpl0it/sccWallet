@@ -1,4 +1,4 @@
-# [![ScPrime WebWallet](https://gitlab.com/scpcorp/webwallet/-/blob/main/logo.png)](http://scpri.me)
+# [![ScPrime WebWallet](https://scpri.me/imagestore/SPRho_256x256.png)](http://scpri.me)
 
 [![Build Status](https://gitlab.com/scpcorp/webwallet/badges/main/pipeline.svg)](https://gitlab.com/scpcorp/webwallet/commits/main)
 [![GoDoc](https://godoc.org/gitlab.com/scpcorp/webwallet?status.svg)](https://godoc.org/gitlab.com/scpcorp/webwallet)
