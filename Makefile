@@ -22,57 +22,9 @@ cpkg = ./modules/renter
 # pkgs changes which packages the makefile calls operate on. run changes which
 # tests are run during testing.
 pkgs = \
-	./benchmark \
-	./build \
-	./cmd/node-scanner \
 	./cmd/scp-webwallet \
-	./cmd/pubaccess-benchmark \
-	./compatibility \
-	./crypto \
-	./modules \
-	./modules/consensus \
-	./modules/explorer \
-	./modules/gateway \
-	./modules/host \
-	./modules/host/contractmanager \
-	./modules/host/mdm \
-	./modules/miner \
-	./modules/renter \
-	./modules/renter/contractor \
-	./modules/renter/filesystem \
-	./modules/stratumminer \
-	./modules/renter/filesystem/siadir \
-	./modules/renter/filesystem/siafile \
-	./modules/renter/hostdb \
-	./modules/renter/hostdb/hosttree \
-	./modules/renter/proto \
-	./modules/renter/pubaccessblacklist \
-	./modules/renter/pubaccessportals \
-	./modules/transactionpool \
-	./modules/wallet \
-	./node \
-	./node/api \
-	./node/api/server \
-	./node/api/client \
-	./persist \
-	./profile \
-	./siatest \
-	./siatest/consensus \
-	./siatest/daemon \
-	./siatest/dependencies \
-	./siatest/gateway \
-	./siatest/host \
-	./siatest/miner \
-	./siatest/renter \
-	./siatest/renter/contractor \
-	./siatest/renter/hostdb \
-	./siatest/renterhost \
-	./siatest/transactionpool \
-	./siatest/wallet \
-	./pubaccesskey \
-	./sync \
-	./types \
-	./types/typesutil
+	./resources \
+	./server
 
 # release-pkgs determine which packages are built for release and distrubtion
 # when running a 'make release' command.
