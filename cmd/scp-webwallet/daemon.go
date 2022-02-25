@@ -22,11 +22,11 @@ func printVersionAndRevision() {
 	if build.DEBUG {
 		fmt.Println("Running with debugging enabled")
 	}
-  if build.Version == "" {
-    fmt.Println("WARN: compiled without version.")
-  } else {
-    fmt.Println("ScPrime Web Wallet v" + build.Version)
-  }
+	if build.Version == "" {
+		fmt.Println("WARN: compiled without version.")
+	} else {
+		fmt.Println("ScPrime Web Wallet v" + build.Version)
+	}
 	if build.GitRevision == "" {
 		fmt.Println("WARN: compiled without build commit.")
 	} else {
@@ -52,17 +52,17 @@ func installMmapSignalHandler() {
 }
 
 func startNode(nodeParams node.NodeParams, loadStart time.Time) {
-  node, errChan := node.New(nodeParams, loadStart) 
-  fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG ABOVE MESSAGE IS IN THE WRONG GOLANG FILE.")
-  if err := modules.PeekErr(errChan); err != nil {
-    fmt.Println("server is unable to create the ScPrime node")
-  }
-  server.AttachNode(node)
-  // Print a 'startup complete' message.
-  startupTime := time.Since(loadStart)
-  fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
-  // attach node to daemon
-  n = node
+	node, errChan := node.New(nodeParams, loadStart)
+	fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG ABOVE MESSAGE IS IN THE WRONG GOLANG FILE.")
+	if err := modules.PeekErr(errChan); err != nil {
+		fmt.Println("server is unable to create the ScPrime node")
+	}
+	server.AttachNode(node)
+	// Print a 'startup complete' message.
+	startupTime := time.Since(loadStart)
+	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
+	// attach node to daemon
+	n = node
 }
 
 // installKillSignalHandler installs a signal handler for os.Interrupt, os.Kill
@@ -92,22 +92,21 @@ func startDaemon() (err error) {
 	// configure the the node params.
 	nodeParams := configNodeParams()
 
-  // Start a node
-  go startNode(nodeParams, loadStart)
+	// Start a node
+	go startNode(nodeParams, loadStart)
 
 	// Launch the GUI
 	go launch("http://" + nodeParams.APIaddr)
 
-  // Start Server
-  httpServerExitDone := &sync.WaitGroup{}
-  httpServerExitDone.Add(1)
-  server.StartHttpServer(nodeParams.APIaddr, httpServerExitDone)
-  httpServerExitDone.Wait()
+	// Start Server
+	httpServerExitDone := &sync.WaitGroup{}
+	httpServerExitDone.Add(1)
+	server.StartHttpServer(nodeParams.APIaddr, httpServerExitDone)
+	httpServerExitDone.Wait()
 
-  // Close
-  if n != nil {
-    n.Close()
-  }
+	// Close
+	if n != nil {
+		n.Close()
+	}
 	return nil
 }
-

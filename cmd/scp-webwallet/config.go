@@ -47,4 +47,3 @@ func defaultScPrimeUiDir() string {
 		return filepath.Join(os.Getenv("HOME"), ".scprime-webwallet")
 	}
 }
-

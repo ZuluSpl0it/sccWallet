@@ -1,22 +1,22 @@
 package server
 
 import (
-  "crypto/rand"
-  "encoding/hex"
-  "fmt"
+	"crypto/rand"
+	"encoding/hex"
+	"fmt"
 	"net/http"
-  "sync"
-  "time"
+	"sync"
+	"time"
 
-  "gitlab.com/scpcorp/ScPrime/node"
+	"gitlab.com/scpcorp/ScPrime/node"
 )
 
 var (
-  n *node.Node
-  srv *http.Server
-  status string
-  heartbeat time.Time
-  sessions []*Session
+	n         *node.Node
+	srv       *http.Server
+	status    string
+	heartbeat time.Time
+	sessions  []*Session
 )
 
 // Session is a struct that tracks session settings
@@ -27,20 +27,22 @@ type Session struct {
 	cachedPage    string
 }
 
+// StartHttpServer starts the HTTP server to serve the GUI.
 func StartHttpServer(addr string, wg *sync.WaitGroup) *http.Server {
-  srv = &http.Server{Addr: addr, Handler: buildHttpRoutes()}
-  go func() {
-    defer wg.Done()
-    if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-      fmt.Printf("ListenAndServe(): %v", err)
-    }
-  }()
-  return srv
+	srv = &http.Server{Addr: addr, Handler: buildHttpRoutes()}
+	go func() {
+		defer wg.Done()
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			fmt.Printf("ListenAndServe(): %v", err)
+		}
+	}()
+	return srv
 }
 
+// AttachNode attaches the node modules to the HTTP server.
 func AttachNode(node *node.Node) {
-  n = node
-  srv.Handler = buildHttpRoutes()
+	n = node
+	srv.Handler = buildHttpRoutes()
 }
 
 // updateHeartbeat updates and returns the heartbeat time.
@@ -147,4 +149,3 @@ func getCachedPage(sessionId string) string {
 	}
 	return ""
 }
-
