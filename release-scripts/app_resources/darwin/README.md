@@ -1,5 +1,5 @@
 # Overview
-The scp-ui.app is a container houses a `Info.plist` metadata file and a `Contents/Resources/icon.icns` file. The release script is designed to copy this container into the Darwin release folder and then set the build target to `Contents/MacOs/scp-ui.app` to inject the scp-ui binary into the container. Releasing a binary that is injected into this template allows the binary to have a custom icon, custom metadata, and does not launch a terminal window when double-clicking on the application.
+The scp-webwallet.app is a container houses a `Info.plist` metadata file and a `Contents/Resources/icon.icns` file. The release script is designed to copy this container into the Darwin release folder and then set the build target to `Contents/MacOs/scp-webwallet.app` to inject the scp-webwallet binary into the container. Releasing a binary that is injected into this template allows the binary to have a custom icon, custom metadata, and does not launch a terminal window when double-clicking on the application.
 
 # Editing
 To change the apps metadata edit the` Info.plist` file. To change the icon replace `Contents/Resources/icon.icns` with a new `icon.icns` file.

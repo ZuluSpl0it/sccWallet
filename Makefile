@@ -25,7 +25,7 @@ pkgs = \
 	./benchmark \
 	./build \
 	./cmd/node-scanner \
-	./cmd/scp-ui \
+	./cmd/scp-webwallet \
 	./cmd/pubaccess-benchmark \
 	./compatibility \
 	./crypto \
@@ -76,14 +76,14 @@ pkgs = \
 
 # release-pkgs determine which packages are built for release and distrubtion
 # when running a 'make release' command.
-release-pkgs = ./cmd/scp-ui
+release-pkgs = ./cmd/scp-webwallet
 
 # lockcheckpkgs are the packages that are checked for locking violations.
 lockcheckpkgs = \
 	./benchmark \
 	./build \
 	./cmd/node-scanner \
-	./cmd/scp-ui \
+	./cmd/scp-webwallet \
 	./cmd/pubaccess-benchmark \
 	./node \
 	./node/api \

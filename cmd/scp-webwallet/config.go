@@ -31,10 +31,10 @@ func configNodeParams() node.NodeParams {
 	return params
 }
 
-// defaultScPrimeUiDir returns the default data directory of scp-ui. The values for
-// supported operating systems are:
+// defaultScPrimeUiDir returns the default data directory of scp-webwallet.
+// The values for supported operating systems are:
 //
-// Linux:   $HOME/.scp-webwallet
+// Linux:   $HOME/.scprime-webwallet
 // MacOS:   $HOME/Library/Application Support/ScPrime-WebWallet
 // Windows: %LOCALAPPDATA%\ScPrime-WebWallet
 func defaultScPrimeUiDir() string {
