@@ -17,6 +17,7 @@ var (
 	status    string
 	heartbeat time.Time
 	sessions  []*Session
+	waitCh    chan struct{}
 )
 
 // Session is a struct that tracks session settings
@@ -28,7 +29,9 @@ type Session struct {
 }
 
 // StartHttpServer starts the HTTP server to serve the GUI.
-func StartHttpServer(addr string, wg *sync.WaitGroup) *http.Server {
+func StartHttpServer(addr string) {
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
 	srv = &http.Server{Addr: addr, Handler: buildHttpRoutes()}
 	go func() {
 		defer wg.Done()
@@ -36,7 +39,16 @@ func StartHttpServer(addr string, wg *sync.WaitGroup) *http.Server {
 			fmt.Printf("ListenAndServe(): %v", err)
 		}
 	}()
-	return srv
+	waitCh = make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(waitCh)
+	}()
+}
+
+// Wait returns the servers wait channel
+func Wait() chan struct{} {
+	return waitCh
 }
 
 // AttachNode attaches the node modules to the HTTP server.

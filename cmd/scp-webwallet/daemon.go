@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -51,6 +50,15 @@ func installMmapSignalHandler() {
 	}()
 }
 
+// installKillSignalHandler installs a signal handler for os.Interrupt, os.Kill
+// and syscall.SIGTERM and returns a channel that is closed when one of them is
+// caught.
+func installKillSignalHandler() chan os.Signal {
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt, os.Kill, syscall.SIGTERM)
+	return sigChan
+}
+
 func startNode(nodeParams node.NodeParams, loadStart time.Time) {
 	node, errChan := node.New(nodeParams, loadStart)
 	fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG ABOVE MESSAGE IS IN THE WRONG GOLANG FILE.")
@@ -65,19 +73,13 @@ func startNode(nodeParams node.NodeParams, loadStart time.Time) {
 	n = node
 }
 
-// installKillSignalHandler installs a signal handler for os.Interrupt, os.Kill
-// and syscall.SIGTERM and returns a channel that is closed when one of them is
-// caught.
-func installKillSignalHandler() chan os.Signal {
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, os.Kill, syscall.SIGTERM)
-	return sigChan
-}
-
 // startDaemon uses the config parameters to initialize modules and start the web wallet.
 func startDaemon() (err error) {
 	// Record startup time
 	loadStart := time.Now()
+
+	// listen for kill signals
+	sigChan := installKillSignalHandler()
 
 	// Print the Version and GitRevision
 	printVersionAndRevision()
@@ -99,10 +101,14 @@ func startDaemon() (err error) {
 	go launch("http://" + nodeParams.APIaddr)
 
 	// Start Server
-	httpServerExitDone := &sync.WaitGroup{}
-	httpServerExitDone.Add(1)
-	server.StartHttpServer(nodeParams.APIaddr, httpServerExitDone)
-	httpServerExitDone.Wait()
+	server.StartHttpServer(nodeParams.APIaddr)
+
+	select {
+	case <-server.Wait():
+		fmt.Println("Server was stopped, quitting...")
+	case <-sigChan:
+		fmt.Println("\rCaught stop signal, quitting...")
+	}
 
 	// Close
 	if n != nil {

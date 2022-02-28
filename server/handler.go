@@ -901,7 +901,7 @@ func restoreSeedHelper(newPassword string, seed modules.Seed) {
 func shutdownHelper() {
 	time.Sleep(5000 * time.Millisecond)
 	if time.Now().After(heartbeat.Add(5000 * time.Millisecond)) {
-		fmt.Println("Shutting Down...")
+		fmt.Println("Heartbeat expired.")
 		srv.Shutdown(context.Background())
 	}
 }
