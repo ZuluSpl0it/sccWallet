@@ -53,9 +53,6 @@ linters-settings:
     check-shadowing: false
     disable-all: false
 
-  golint:
-    min-confidence: 1.0
-
   gocritic:
     # Which checks should be enabled; can't be combined with 'disabled-checks';
     # See https://go-critic.github.io/overview#checks-overview
@@ -80,16 +77,19 @@ linters-settings:
       - underef
       - equalFold
 
+    revive:
+      min-confidence: 1.0
+
 linters:
   disable-all: true
   fast: false
   enable:
     - gocritic
     - gofmt
-    - golint
     - gosec
     - govet
     - misspell
+    - revive
     - typecheck
     - whitespace
 

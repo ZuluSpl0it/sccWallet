@@ -100,7 +100,7 @@ func startDaemon() (err error) {
 	go launch("http://" + nodeParams.APIaddr)
 
 	// Start Server
-	server.StartHttpServer(nodeParams.APIaddr)
+	server.StartHTTPServer(nodeParams.APIaddr)
 
 	select {
 	case <-server.Wait():

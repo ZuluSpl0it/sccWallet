@@ -76,7 +76,7 @@ func scriptHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params
 }
 
 func styleHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var cssStyleSheet = resources.CssStyleSheet()
+	var cssStyleSheet = resources.CSSStyleSheet()
 	w.Header().Set("Content-Type", "text/css; charset=utf-8")
 	w.Header().Set("Content-Length", strconv.Itoa(len(cssStyleSheet))) //len(dec)
 	w.Write(cssStyleSheet)
@@ -136,14 +136,14 @@ func transctionHistoryCsvExportHelper() (string, error) {
 }
 
 func alertChangeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
 	title := "CHANGE LOCK"
 	form := resources.ChangeLockForm()
-	writeForm(w, title, form, sessionId)
+	writeForm(w, title, form, sessionID)
 }
 
 func alertInitializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -153,19 +153,19 @@ func alertInitializeSeedHandler(w http.ResponseWriter, req *http.Request, _ http
 }
 
 func alertSendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
 	title := "SEND"
 	form := resources.SendCoinsForm()
-	writeForm(w, title, form, sessionId)
+	writeForm(w, title, form, sessionID)
 }
 
 func alertReceiveCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
@@ -173,31 +173,31 @@ func alertReceiveCoinsHandler(w http.ResponseWriter, req *http.Request, _ httpro
 	addresses, err := n.Wallet.LastAddresses(1)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if len(addresses) == 0 {
 		_, err := n.Wallet.NextAddress()
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, sessionId)
+			writeError(w, msg, sessionID)
 			return
 		}
 	}
 	addresses, err = n.Wallet.LastAddresses(1)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	title := "RECEIVE"
 	msg := strings.ToUpper(fmt.Sprintf("%s", addresses[0]))
-	writeMsg(w, title, msg, sessionId)
+	writeMsg(w, title, msg, sessionID)
 }
 
 func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
@@ -226,18 +226,18 @@ func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprou
 	primarySeed, _, err := n.Wallet.PrimarySeed()
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	primarySeedStr, err := modules.SeedToString(primarySeed, dictionary)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	title := "RECOVER SEED"
 	msg := fmt.Sprintf("%s", primarySeedStr)
-	writeMsg(w, title, msg, sessionId)
+	writeMsg(w, title, msg, sessionID)
 }
 
 func alertRestoreFromSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -252,8 +252,8 @@ func alertRestoreFromSeedHandler(w http.ResponseWriter, req *http.Request, _ htt
 }
 
 func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
@@ -268,32 +268,32 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	}
 	if origPassword == "" {
 		msg := msgPrefix + "The original password must be provided."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	validPass, err := isPasswordValid(origPassword)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	} else if !validPass {
 		msg := msgPrefix + "The original password is not valid."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if newPassword == "" {
 		msg := msgPrefix + "A new password must be provided."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if confirmPassword == "" {
 		msg := msgPrefix + "A confirmation password must be provided."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if newPassword != confirmPassword {
 		msg := msgPrefix + "New password does not match confirmation password."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	var newKey crypto.CipherKey
@@ -302,7 +302,7 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	err = n.Wallet.ChangeKeyWithSeed(primarySeed, newKey)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	guiHandler(w, req, nil)
@@ -346,13 +346,13 @@ func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httproute
 	go initializeSeedHelper(newPassword)
 	title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 	form := resources.ScanningWalletForm()
-	sessionId := addSessionId()
-	writeForm(w, title, form, sessionId)
+	sessionID := addSessionID()
+	writeForm(w, title, form, sessionID)
 }
 
 func lockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
@@ -427,13 +427,13 @@ func restoreSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	go restoreSeedHelper(newPassword, seed)
 	title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 	form := resources.ScanningWalletForm()
-	sessionId := addSessionId()
-	writeForm(w, title, form, sessionId)
+	sessionID := addSessionID()
+	writeForm(w, title, form, sessionID)
 }
 
 func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		msg := "Session ID does not exist."
 		writeError(w, msg, "")
 	}
@@ -458,7 +458,7 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	dest, err := scanAddress(req.FormValue("destination"))
 	if err != nil {
 		msg := msgPrefix + "Destination is not valid."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	coinType := req.FormValue("coin_type")
@@ -466,31 +466,31 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 		amount, err := types.NewCurrencyStr(req.FormValue("amount") + "SCP")
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, sessionId)
+			writeError(w, msg, sessionID)
 			return
 		}
 		_, err = n.Wallet.SendSiacoins(amount, dest)
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, sessionId)
+			writeError(w, msg, sessionID)
 			return
 		}
 	} else if coinType == "SPF" {
 		amount, err := types.NewCurrencyStr(req.FormValue("amount") + "SPF")
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, sessionId)
+			writeError(w, msg, sessionID)
 			return
 		}
 		_, err = n.Wallet.SendSiafunds(amount, dest)
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, sessionId)
+			writeError(w, msg, sessionID)
 			return
 		}
 	} else {
 		msg := msgPrefix + "Coin type was not supplied."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	guiHandler(w, req, nil)
@@ -527,19 +527,19 @@ func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 		writeError(w, msg, "")
 		return
 	}
-	sessionId := addSessionId()
+	sessionID := addSessionID()
 	if status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
-	writeWallet(w, sessionId)
+	writeWallet(w, sessionID)
 }
 
 func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
 		writeForm(w, "UNLOCK WALLET", form, "")
 		return
@@ -547,42 +547,42 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	var msgPrefix = "Unable to retrieve the transaction: "
 	if req.FormValue("transaction_id") == "" {
 		msg := msgPrefix + "No transaction ID was provided."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
-	var transactionId types.TransactionID
+	var transactionID types.TransactionID
 	jsonID := "\"" + req.FormValue("transaction_id") + "\""
-	err := transactionId.UnmarshalJSON([]byte(jsonID))
+	err := transactionID.UnmarshalJSON([]byte(jsonID))
 	if err != nil {
 		msg := msgPrefix + "Unable to parse transaction ID."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
-	txn, ok, err := n.Wallet.Transaction(transactionId)
+	txn, ok, err := n.Wallet.Transaction(transactionID)
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if !ok {
 		msg := msgPrefix + "Transaction was not found."
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	transactionDetails, _ := transactionExplorerHelper(txn)
-	html := resources.WalletHtmlTemplate()
+	html := resources.WalletHTMLTemplate()
 	html = strings.Replace(html, "&TRANSACTION_PORTAL;", transactionDetails, -1)
-	writeHtml(w, html, sessionId)
+	writeHTML(w, html, sessionID)
 }
 
 func downloadingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	html := strings.Replace(resources.DownloadingHtml(), "&DOWNLOADER_PROGRESS;", downloader.Progress(), -1)
+	html := strings.Replace(resources.DownloadingHTML(), "&DOWNLOADER_PROGRESS;", downloader.Progress(), -1)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, html)
 }
 
 func loadingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var body = resources.LoadingHtml()
+	var body = resources.LoadingHTML()
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.Header().Set("Content-Length", strconv.Itoa(len(body))) //len(dec)
 	w.Write(body)
@@ -593,37 +593,37 @@ func notLoadedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 }
 
 func expandMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
 		writeForm(w, "UNLOCK WALLET", form, "")
 		return
 	}
-	expandMenu(sessionId)
-	writeHtml(w, getCachedPage(sessionId), sessionId)
+	expandMenu(sessionID)
+	writeHTML(w, getCachedPage(sessionID), sessionID)
 }
 
 func collapseMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
 		writeForm(w, "UNLOCK WALLET", form, "")
 		return
 	}
-	collapseMenu(sessionId)
-	writeHtml(w, getCachedPage(sessionId), sessionId)
+	collapseMenu(sessionID)
+	writeHTML(w, getCachedPage(sessionID), sessionID)
 }
 
 func scanningHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
+	sessionID := req.FormValue("session_id")
 	height, _, _ := blockHeightHelper()
 	if height == "0" && status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
 		writeForm(w, "UNLOCK WALLET", form, "")
 		return
@@ -631,64 +631,64 @@ func scanningHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	if status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
 	guiHandler(w, req, nil)
 }
 
 func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.Params) {
-	sessionId := req.FormValue("session_id")
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
 		writeForm(w, "UNLOCK WALLET", form, "")
 		return
 	}
 	page, _ := strconv.Atoi(req.FormValue("page"))
-	setTxHistoryPage(page, sessionId)
+	setTxHistoryPage(page, sessionID)
 	guiHandler(w, req, nil)
 }
 
 func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	sessionId := req.FormValue("session_id")
+	sessionID := req.FormValue("session_id")
 	height, _, _ := blockHeightHelper()
 	if height == "0" && status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
 	encrypted, err := n.Wallet.Encrypted()
 	if err != nil {
 		msg := fmt.Sprintf("Unable to determine if wallet is encrypted: %v", err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if !encrypted {
 		title := "INITIALIZE WALLET"
 		form := resources.InitializeWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
-	if sessionId == "" || !sessionIdExists(sessionId) {
+	if sessionID == "" || !sessionIDExists(sessionID) {
 		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, sessionId)
+		writeForm(w, "UNLOCK WALLET", form, sessionID)
 		return
 	}
 	if status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
-		writeForm(w, title, form, sessionId)
+		writeForm(w, title, form, sessionID)
 		return
 	}
 	unlocked, err := n.Wallet.Unlocked()
 	if err != nil {
 		msg := fmt.Sprintf("Unable to determine if wallet is unlocked: %v", err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
 	if unlocked {
-		writeWallet(w, sessionId)
+		writeWallet(w, sessionID)
 		return
 	}
 	title := "UNLOCK WALLET"
@@ -696,20 +696,20 @@ func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	writeForm(w, title, form, "")
 }
 
-func writeWallet(w http.ResponseWriter, sessionId string) {
-	transactionHistoryLines, pages, err := transactionHistoryHelper(sessionId)
+func writeWallet(w http.ResponseWriter, sessionID string) {
+	transactionHistoryLines, pages, err := transactionHistoryHelper(sessionID)
 	if err != nil {
 		msg := fmt.Sprintf("Unable to generate transaction history: %v", err)
-		writeError(w, msg, sessionId)
+		writeError(w, msg, sessionID)
 		return
 	}
-	html := resources.WalletHtmlTemplate()
-	html = strings.Replace(html, "&TRANSACTION_PORTAL;", resources.TransactionsHistoryHtmlTemplate(), -1)
+	html := resources.WalletHTMLTemplate()
+	html = strings.Replace(html, "&TRANSACTION_PORTAL;", resources.TransactionsHistoryHTMLTemplate(), -1)
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_LINES;", transactionHistoryLines, -1)
 	options := ""
 	for i := 0; i < pages+1; i++ {
 		selected := ""
-		if i+1 == getTxHistoryPage(sessionId) {
+		if i+1 == getTxHistoryPage(sessionID) {
 			selected = "selected"
 		}
 		options = fmt.Sprintf("<option %s value='%d'>%d</option>", selected, i+1, i+1) + options
@@ -721,7 +721,7 @@ func writeWallet(w http.ResponseWriter, sessionId string) {
 	}
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGE;", options, -1)
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGES;", strconv.Itoa(pages+1), -1)
-	writeHtml(w, html, sessionId)
+	writeHTML(w, html, sessionID)
 }
 
 func writeArray(w http.ResponseWriter, arr []string) {
@@ -730,33 +730,33 @@ func writeArray(w http.ResponseWriter, arr []string) {
 	fmt.Fprint(w, string(encjson))
 }
 
-func writeError(w http.ResponseWriter, msg string, sessionId string) {
-	html := resources.AlertHtmlTemplate()
+func writeError(w http.ResponseWriter, msg string, sessionID string) {
+	html := resources.AlertHTMLTemplate()
 	html = strings.Replace(html, "&POPUP_TITLE;", "ERROR", -1)
 	html = strings.Replace(html, "&POPUP_CONTENT;", msg, -1)
 	html = strings.Replace(html, "&POPUP_CLOSE;", resources.CloseAlertForm(), -1)
 	fmt.Println(msg)
-	writeHtml(w, html, sessionId)
+	writeHTML(w, html, sessionID)
 }
 
-func writeMsg(w http.ResponseWriter, title string, msg string, sessionId string) {
-	html := resources.AlertHtmlTemplate()
+func writeMsg(w http.ResponseWriter, title string, msg string, sessionID string) {
+	html := resources.AlertHTMLTemplate()
 	html = strings.Replace(html, "&POPUP_TITLE;", title, -1)
 	html = strings.Replace(html, "&POPUP_CONTENT;", msg, -1)
 	html = strings.Replace(html, "&POPUP_CLOSE;", resources.CloseAlertForm(), -1)
-	writeHtml(w, html, sessionId)
+	writeHTML(w, html, sessionID)
 }
 
-func writeForm(w http.ResponseWriter, title string, form string, sessionId string) {
-	html := resources.AlertHtmlTemplate()
+func writeForm(w http.ResponseWriter, title string, form string, sessionID string) {
+	html := resources.AlertHTMLTemplate()
 	html = strings.Replace(html, "&POPUP_TITLE;", title, -1)
 	html = strings.Replace(html, "&POPUP_CONTENT;", form, -1)
 	html = strings.Replace(html, "&POPUP_CLOSE;", "", -1)
-	writeHtml(w, html, sessionId)
+	writeHTML(w, html, sessionID)
 }
 
-func writeHtml(w http.ResponseWriter, html string, sessionId string) {
-	cachedPage(html, sessionId)
+func writeHTML(w http.ResponseWriter, html string, sessionID string) {
+	cachedPage(html, sessionID)
 	fmtHeight, fmtStatus, fmtStatCo := blockHeightHelper()
 	html = strings.Replace(html, "&STATUS_COLOR;", fmtStatCo, -1)
 	html = strings.Replace(html, "&STATUS;", fmtStatus, -1)
@@ -766,12 +766,12 @@ func writeHtml(w http.ResponseWriter, html string, sessionId string) {
 	html = strings.Replace(html, "&UNCONFIRMED_DELTA;", fmtUncBal, -1)
 	html = strings.Replace(html, "&SPF_BALANCE;", fmtSpfBal, -1)
 	html = strings.Replace(html, "&SCP_CLAIM_BALANCE;", fmtClmBal, -1)
-	if menuIsCollapsed(sessionId) {
+	if menuIsCollapsed(sessionID) {
 		html = strings.Replace(html, "&MENU;", resources.CollapsedMenuForm(), -1)
 	} else {
 		html = strings.Replace(html, "&MENU;", resources.ExpandedMenuForm(), -1)
 	}
-	html = strings.Replace(html, "&SESSION_ID;", sessionId, -1)
+	html = strings.Replace(html, "&SESSION_ID;", sessionID, -1)
 	// add random data to links to act as a cache buster.
 	// must be done last in case a cache buster is added in from a template.
 	b := make([]byte, 16) //32 characters long
@@ -909,12 +909,12 @@ func shutdownHelper() {
 func transactionExplorerHelper(txn modules.ProcessedTransaction) (string, error) {
 	unixTime, _ := strconv.ParseInt(fmt.Sprintf("%v", txn.ConfirmationTimestamp), 10, 64)
 	fmtTime := strings.ToUpper(time.Unix(unixTime, 0).Format("2006-01-02 15:04"))
-	fmtTxnId := strings.ToUpper(fmt.Sprintf("%v", txn.TransactionID))
+	fmtTxnID := strings.ToUpper(fmt.Sprintf("%v", txn.TransactionID))
 	fmtTxnType := strings.ToUpper(strings.Replace(fmt.Sprintf("%v", txn.TxType), "_", " ", -1))
 	fmtTxnBlock := strings.ToUpper(fmt.Sprintf("%v", txn.ConfirmationHeight))
 	html := resources.TransactionInfoTemplate()
 	html = strings.Replace(html, "&TXN_TYPE;", fmtTxnType, -1)
-	html = strings.Replace(html, "&TXN_ID;", fmtTxnId, -1)
+	html = strings.Replace(html, "&TXN_ID;", fmtTxnID, -1)
 	html = strings.Replace(html, "&TXN_TIME;", fmtTime, -1)
 	html = strings.Replace(html, "&TXN_BLOCK;", fmtTxnBlock, -1)
 	inputs := ""
@@ -948,9 +948,9 @@ func transactionExplorerHelper(txn modules.ProcessedTransaction) (string, error)
 	return html, nil
 }
 
-func transactionHistoryHelper(sessionId string) (string, int, error) {
+func transactionHistoryHelper(sessionID string) (string, int, error) {
 	html := ""
-	page := getTxHistoryPage(sessionId)
+	page := getTxHistoryPage(sessionID)
 	pageSize := 20
 	pageMin := (page - 1) * pageSize
 	pageMax := page * pageSize
@@ -978,7 +978,7 @@ func transactionHistoryHelper(sessionId string) (string, int, error) {
 				if txn.Spf != "" {
 					fmtAmount = fmtAmount + "; " + txn.Spf
 				}
-				row := resources.TransactionHistoryLineHtmlTemplate()
+				row := resources.TransactionHistoryLineHTMLTemplate()
 				row = strings.Replace(row, "&TRANSACTION_ID;", txn.TxnId, -1)
 				row = strings.Replace(row, "&TYPE;", txn.Type, -1)
 				row = strings.Replace(row, "&TIME;", txn.Time, -1)
