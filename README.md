@@ -7,6 +7,9 @@
 
 ScPrime has released a browser based GUI (Graphical User Interface) wallet called the WebWallet, that is purely for storing your SCP and doesn't have the 'hosting' aspect that the CLI or UI software has. If you're just looking for software to just send, receive, and hold your SCP, this is a good option for you.
 
+Usage
+-----
+
 Online documentation available at https://docs.scpri.me/software/webwallet
 
 Building From Source
@@ -20,4 +23,16 @@ cd webwallet && make
 ```
 
 This will install the `scp-webwallet` binary in your $GOPATH/bin folder (By default, this is $HOME/go/bin).
+
+Other Makefile commands are:
+* `make all`, another way to build and install the release binaries
+* `make fmt`, uses go fmt to format all golang files
+* `make vet`, uses go vet to analyze all golang files for suspicious, abnormal, or useless code
+* `make lint`, lints all golang files with the linters defined in `.golangci.yml`
+* `make debug`, builds and installs the debug binary
+* `make dev`, builds and installs the developer binary
+* `make release`, builds and installs the release binary
+* `make clean`, deletes and cruft from this code repository
+* `make test`, runs the test suite
+* `make code`, generates code coverage reports and saves them to this project's cover folder
 

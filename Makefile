@@ -28,12 +28,6 @@ release-pkgs = ./cmd/scp-webwallet
 # run determines which tests run when running any variation of 'make test'.
 run = .
 
-# dependencies list all packages needed to run make commands used to build, test
-# and lint the binaries locally and in CI systems.
-dependencies:
-	go get -d ./...
-	./install-dependencies.sh
-
 # fmt calls go fmt on all packages.
 fmt:
 	gofmt -s -l -w $(pkgs)
@@ -47,35 +41,27 @@ vet:
 lint:
 	golangci-lint run -c .golangci.yml ./...
 
-# debug builds and installs debug binaries. This will also install the utils.
+# debug builds and installs debug binaries.
 debug:
-	go install -tags='debug profile netgo' -ldflags='$(ldflags)' $(pkgs)
-debug-race:
-	GORACE='$(racevars)' go install -race -tags='debug profile netgo' -ldflags='$(ldflags)' $(pkgs)
+	go install -tags='debug profile netgo' -ldflags='$(ldflags)' $(release-pkgs)
 
-# dev builds and installs developer binaries. This will also install the utils.
+# dev builds and installs developer binaries.
 dev:
-	go install -tags='dev debug profile netgo' -ldflags='$(ldflags)' $(pkgs)
-dev-race:
-	GORACE='$(racevars)' go install -race -tags='dev debug profile netgo' -ldflags='$(ldflags)' $(pkgs)
+	go install -tags='dev debug profile netgo' -ldflags='$(ldflags)' $(release-pkgs)
 
 # release builds and installs release binaries.
 release:
 	go install -tags='netgo' -ldflags='-s -w $(ldflags)' $(release-pkgs)
-release-race:
-	GORACE='$(racevars)' go install -race -tags='netgo' -ldflags='-s -w $(ldflags)' $(release-pkgs)
-release-util:
-	go install -tags='netgo' -ldflags='-s -w $(ldflags)' $(release-pkgs) $(util-pkgs)
 
 # clean removes all directories that get automatically created during
 # development.
 clean:
 ifneq ("$(OS)","Windows_NT")
 # Linux
-	rm -rf cover
+	rm -rf cover release
 else
 # Windows
-	- DEL /F /Q cover
+	- DEL /F /Q cover release
 endif
 
 test:
