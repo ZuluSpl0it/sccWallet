@@ -10,7 +10,6 @@ import (
 	"gitlab.com/scpcorp/webwallet/server"
 
 	"gitlab.com/scpcorp/ScPrime/build"
-	"gitlab.com/scpcorp/ScPrime/modules"
 	"gitlab.com/scpcorp/ScPrime/node"
 )
 
@@ -60,17 +59,17 @@ func installKillSignalHandler() chan os.Signal {
 }
 
 func startNode(nodeParams node.NodeParams, loadStart time.Time) {
-	node, errChan := node.New(nodeParams, loadStart)
-	fmt.Println("ACTUALLY, THE API IS NOT LOADED. THE LOG ABOVE MESSAGE IS IN THE WRONG GOLANG FILE.")
-	if err := modules.PeekErr(errChan); err != nil {
-		fmt.Println("server is unable to create the ScPrime node")
+	node, err := newNode(nodeParams)
+	if err != nil {
+		fmt.Println("Server is unable to create the ScPrime node.")
+		fmt.Println(err)
+		return
 	}
 	server.AttachNode(node)
+	n = node
 	// Print a 'startup complete' message.
 	startupTime := time.Since(loadStart)
 	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
-	// attach node to daemon
-	n = node
 }
 
 // startDaemon uses the config parameters to initialize modules and start the web wallet.
