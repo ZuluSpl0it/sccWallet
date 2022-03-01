@@ -24,7 +24,7 @@ func configNodeParams() node.NodeParams {
 	params.Bootstrap = true
 	params.SiaMuxTCPAddress = ":4303"
 	params.SiaMuxWSAddress = ":4304"
-	params.Dir = defaultScPrimeUiDir()
+	params.Dir = defaultScPrimeUIDir()
 	params.APIaddr = "localhost:4300"
 	params.CheckTokenExpirationFrequency = 1 * time.Hour // default
 	params.Headless = true
@@ -37,7 +37,7 @@ func configNodeParams() node.NodeParams {
 // Linux:   $HOME/.scprime-webwallet
 // MacOS:   $HOME/Library/Application Support/ScPrime-WebWallet
 // Windows: %LOCALAPPDATA%\ScPrime-WebWallet
-func defaultScPrimeUiDir() string {
+func defaultScPrimeUIDir() string {
 	switch runtime.GOOS {
 	case "windows":
 		return filepath.Join(os.Getenv("LOCALAPPDATA"), "ScPrime-WebWallet")

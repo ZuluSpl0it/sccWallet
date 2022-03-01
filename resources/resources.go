@@ -17,22 +17,22 @@ var cssStyleSheet []byte
 var javascript []byte
 
 //go:embed resources/downloading.html
-var downloadingHtml string
+var downloadingHTML string
 
 //go:embed resources/loading.html
-var loadingHtml []byte
+var loadingHTML []byte
 
 //go:embed resources/wallet_template.html
-var walletHtmlTemplate string
+var walletHTMLTemplate string
 
 //go:embed resources/alert_template.html
-var alertHtmlTemplate string
+var alertHTMLTemplate string
 
 //go:embed resources/transaction_templates/history_line_template.html
-var transactionHistoryLineHtmlTemplate string
+var transactionHistoryLineHTMLTemplate string
 
 //go:embed resources/transaction_templates/history_template.html
-var transactionsHistoryHtmlTemplate string
+var transactionsHistoryHTMLTemplate string
 
 //go:embed resources/transaction_templates/info_template.html
 var transactionInfoTemplate string
@@ -92,8 +92,8 @@ func Favicon() []byte {
 	return favicon
 }
 
-// CssStyleSheet returns the css style sheet.
-func CssStyleSheet() []byte {
+// CSSStyleSheet returns the css style sheet.
+func CSSStyleSheet() []byte {
 	return cssStyleSheet
 }
 
@@ -102,34 +102,34 @@ func Javascript() []byte {
 	return javascript
 }
 
-// DownloadingHtml returns an html page
-func DownloadingHtml() string {
-	return downloadingHtml
+// DownloadingHTML returns an html page
+func DownloadingHTML() string {
+	return downloadingHTML
 }
 
-// LoadingHtml returns an html page
-func LoadingHtml() []byte {
-	return loadingHtml
+// LoadingHTML returns an html page
+func LoadingHTML() []byte {
+	return loadingHTML
 }
 
-// WalletHtmlTemplate returns the wallet html template
-func WalletHtmlTemplate() string {
-	return walletHtmlTemplate
+// WalletHTMLTemplate returns the wallet html template
+func WalletHTMLTemplate() string {
+	return walletHTMLTemplate
 }
 
-// AlertHtmlTemplate returns the alert html template
-func AlertHtmlTemplate() string {
-	return alertHtmlTemplate
+// AlertHTMLTemplate returns the alert html template
+func AlertHTMLTemplate() string {
+	return alertHTMLTemplate
 }
 
-// TransactionHistoryLineHtmlTemplate returns an HTML template
-func TransactionHistoryLineHtmlTemplate() string {
-	return transactionHistoryLineHtmlTemplate
+// TransactionHistoryLineHTMLTemplate returns an HTML template
+func TransactionHistoryLineHTMLTemplate() string {
+	return transactionHistoryLineHTMLTemplate
 }
 
-// TransactionsHistoryHtmlTemplate returns an HTML template
-func TransactionsHistoryHtmlTemplate() string {
-	return transactionsHistoryHtmlTemplate
+// TransactionsHistoryHTMLTemplate returns an HTML template
+func TransactionsHistoryHTMLTemplate() string {
+	return transactionsHistoryHTMLTemplate
 }
 
 // TransactionInfoTemplate returns an HTML template

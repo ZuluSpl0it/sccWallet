@@ -6,7 +6,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func buildHttpRoutes() *httprouter.Router {
+func buildHTTPRoutes() *httprouter.Router {
 	router := httprouter.New()
 	router.NotFound = http.HandlerFunc(notFoundHandler)
 	router.RedirectTrailingSlash = false

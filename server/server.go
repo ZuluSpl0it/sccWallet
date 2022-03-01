@@ -28,11 +28,11 @@ type Session struct {
 	cachedPage    string
 }
 
-// StartHttpServer starts the HTTP server to serve the GUI.
-func StartHttpServer(addr string) {
+// StartHTTPServer starts the HTTP server to serve the GUI.
+func StartHTTPServer(addr string) {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	srv = &http.Server{Addr: addr, Handler: buildHttpRoutes()}
+	srv = &http.Server{Addr: addr, Handler: buildHTTPRoutes()}
 	go func() {
 		defer wg.Done()
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
@@ -54,7 +54,7 @@ func Wait() chan struct{} {
 // AttachNode attaches the node modules to the HTTP server.
 func AttachNode(node *node.Node) {
 	n = node
-	srv.Handler = buildHttpRoutes()
+	srv.Handler = buildHTTPRoutes()
 }
 
 // updateHeartbeat updates and returns the heartbeat time.
@@ -69,7 +69,7 @@ func setStatus(s string) {
 }
 
 // addSessionId adds a new session ID to memory.
-func addSessionId() string {
+func addSessionID() string {
 	b := make([]byte, 16) //32 characters long
 	rand.Read(b)
 	session := &Session{}
@@ -81,10 +81,10 @@ func addSessionId() string {
 	return session.id
 }
 
-// sessionIdExists returns true when the supplied session ID exists in memory.
-func sessionIdExists(sessionId string) bool {
+// sessionIDExists returns true when the supplied session ID exists in memory.
+func sessionIDExists(sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			return true
 		}
 	}
@@ -92,9 +92,9 @@ func sessionIdExists(sessionId string) bool {
 }
 
 // collapseMenu sets the menu state to collapsed and returns true
-func collapseMenu(sessionId string) bool {
+func collapseMenu(sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			session.collapseMenu = true
 		}
 	}
@@ -102,9 +102,9 @@ func collapseMenu(sessionId string) bool {
 }
 
 // expandMenu sets the menu state to expanded and returns true
-func expandMenu(sessionId string) bool {
+func expandMenu(sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			session.collapseMenu = false
 		}
 	}
@@ -112,9 +112,9 @@ func expandMenu(sessionId string) bool {
 }
 
 // menuIsCollapsed returns true when the menu state is collapsed
-func menuIsCollapsed(sessionId string) bool {
+func menuIsCollapsed(sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			return session.collapseMenu
 		}
 	}
@@ -123,9 +123,9 @@ func menuIsCollapsed(sessionId string) bool {
 }
 
 // setTxHistoryPage sets the session's transaction history page and returns true.
-func setTxHistoryPage(txHistoryPage int, sessionId string) bool {
+func setTxHistoryPage(txHistoryPage int, sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			session.txHistoryPage = txHistoryPage
 		}
 	}
@@ -133,9 +133,9 @@ func setTxHistoryPage(txHistoryPage int, sessionId string) bool {
 }
 
 // getTxHistoryPage returns the session's transaction history page or -1 when no session is found.
-func getTxHistoryPage(sessionId string) int {
+func getTxHistoryPage(sessionID string) int {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			return session.txHistoryPage
 		}
 	}
@@ -143,9 +143,9 @@ func getTxHistoryPage(sessionId string) int {
 }
 
 // cachedPage caches the page without the menu and returns true.
-func cachedPage(cachedPage string, sessionId string) bool {
+func cachedPage(cachedPage string, sessionID string) bool {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			session.cachedPage = cachedPage
 		}
 	}
@@ -153,9 +153,9 @@ func cachedPage(cachedPage string, sessionId string) bool {
 }
 
 // getCachedPage returns the session's cached page.
-func getCachedPage(sessionId string) string {
+func getCachedPage(sessionID string) string {
 	for _, session := range sessions {
-		if session.id == sessionId {
+		if session.id == sessionID {
 			return session.cachedPage
 		}
 	}
