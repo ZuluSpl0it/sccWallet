@@ -9,6 +9,42 @@ button {
   font-size: 16px;
   padding: 14px 40px;
 }
+.txid-button {
+  align-items: normal;
+  background-color: rgba(0,0,0,0);
+  border-color: #2074EE;
+  border-style: none;
+  box-sizing: content-box;
+  box-shadow: none;
+  color: #2074EE; 
+  cursor: pointer;
+  display: inline;
+  font-family: "Open Sans", "Arial", "Helvetica", sans-serif;
+  font-size: 16px;
+  height: auto;
+  padding: 5px;
+  perspective-origin: 0 0;
+  text-align: start;
+  text-decoration: none;
+  text-transform: none;
+  transform-origin: 0 0;
+  width: auto;
+  -moz-appearance: none;
+  -webkit-logical-height: 1em; /* Chrome ignores auto, so we have to use this hack to set the correct height  */
+  -webkit-logical-width: auto; /* Chrome ignores auto, but here for completeness */
+}
+/* Mozilla uses a pseudo-element to show focus on buttons, */
+/* but anchors are highlighted via the focus pseudo-class. */
+@supports (-moz-appearance:none) { /* Mozilla-only */
+  .txid-button::-moz-focus-inner { /* reset any predefined properties */ 
+    border: none;
+    padding: 0;
+  }
+  .txid-button:focus { /* add outline to focus pseudo-class */
+    outline-style: dotted;
+    outline-width: 1px;
+  }
+}
 hr {
   border:none; /* Adds line dividers to terminak browsers */
 }
@@ -46,6 +82,7 @@ a:active {
   display: inline-block;
 }
 .pad {padding: 20px;}
+.pad-col {padding: .5rem;}
 .grid {display:table;width: 100%;}
 .row {display:table-row;width: 100%;}
 .col-1 {display: table-cell;width: 100%;}
@@ -63,7 +100,10 @@ a:active {
 .yellow {color: #FADA5E;}
 .cyan {color: #789D9C;}
 .white {color: #FFFFFF;}
+.white-bar {border-left: 1px solid #FFFFFF; padding-left: .5rem;}
+.white-underline {border-bottom: 1px solid #FFFFFF;}
 .blue-dashed {border-top:2px dashed #2074EE;}
+.blue-bg {background-color: #2074EE;}
 .fade {
   position: absolute;
   top: 0%;
@@ -100,18 +140,6 @@ a:active {
   background-color: #15202B;
   z-index: 1002;
   overflow: auto;
-}
-.pagination {
-  padding-bottom: 20px;
-  padding-left: 20px;
-  padding-top: 20px;
-  padding-right: 0px;
-  border-radius: 25px 0px 0px 25px;
-  border-left: 2px solid #2074EE;
-  border-top: 2px solid #2074EE;
-  border-bottom: 2px solid #2074EE;
-  background-color: #15202B;
-  font-weight: normal;
 }
 /* open-sans-300 - latin */
 @font-face {

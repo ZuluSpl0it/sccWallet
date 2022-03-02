@@ -7,26 +7,32 @@ import (
 	"syscall"
 	"time"
 
+	"gitlab.com/scpcorp/webwallet/build"
 	"gitlab.com/scpcorp/webwallet/server"
 
-	"gitlab.com/scpcorp/ScPrime/build"
+	spdBuild "gitlab.com/scpcorp/ScPrime/build"
 	"gitlab.com/scpcorp/ScPrime/node"
 )
 
 // printVersionAndRevision prints the daemon's version and revision numbers.
 func printVersionAndRevision() {
-	if build.DEBUG {
-		fmt.Println("Running with debugging enabled")
-	}
 	if build.Version == "" {
-		fmt.Println("WARN: compiled without version.")
+		fmt.Println("WARN: compiled ScPrime web wallet without version.")
 	} else {
-		fmt.Println("ScPrime Web Wallet v" + build.Version)
+		fmt.Println("ScPrime web wallet v" + build.Version)
 	}
 	if build.GitRevision == "" {
-		fmt.Println("WARN: compiled without build commit.")
+		fmt.Println("WARN: compiled ScPrime web wallet without version.")
 	} else {
-		fmt.Println("Git Revision " + build.GitRevision)
+		fmt.Println("ScPrime web wallet Git revision " + build.GitRevision)
+	}
+	if spdBuild.DEBUG {
+		fmt.Println("Running ScPrime daemon with debugging enabled")
+	}
+	if spdBuild.Version == "" {
+		fmt.Println("WARN: compiled ScPrime daemon without version.")
+	} else {
+		fmt.Println("ScPrime daemon v" + spdBuild.Version)
 	}
 }
 

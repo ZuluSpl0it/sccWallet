@@ -28,6 +28,9 @@ var walletHTMLTemplate string
 //go:embed resources/alert_template.html
 var alertHTMLTemplate string
 
+//go:embed resources/privacy_template.html
+var privacyHTMLTemplate string
+
 //go:embed resources/transaction_templates/history_line_template.html
 var transactionHistoryLineHTMLTemplate string
 
@@ -42,9 +45,6 @@ var transactionInputTemplate string
 
 //go:embed resources/transaction_templates/output_template.html
 var transactionOutputTemplate string
-
-//go:embed resources/transaction_templates/transaction_pagination_template.html
-var transactionPaginationTemplate string
 
 //go:embed resources/forms/close_alert.html
 var closeAlertForm string
@@ -122,6 +122,11 @@ func AlertHTMLTemplate() string {
 	return alertHTMLTemplate
 }
 
+// PrivacyHTMLTemplate returns the privacy html template
+func PrivacyHTMLTemplate() string {
+	return privacyHTMLTemplate
+}
+
 // TransactionHistoryLineHTMLTemplate returns an HTML template
 func TransactionHistoryLineHTMLTemplate() string {
 	return transactionHistoryLineHTMLTemplate
@@ -145,11 +150,6 @@ func TransactionInputTemplate() string {
 // TransactionOutputTemplate returns an HTML template
 func TransactionOutputTemplate() string {
 	return transactionOutputTemplate
-}
-
-// TransactionPaginationTemplate returns an HTML template
-func TransactionPaginationTemplate() string {
-	return transactionPaginationTemplate
 }
 
 // CloseAlertForm returns the close alert form
