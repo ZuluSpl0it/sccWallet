@@ -12,10 +12,12 @@ import (
 	"strings"
 	"time"
 
+	"gitlab.com/scpcorp/webwallet/build"
 	"gitlab.com/scpcorp/webwallet/resources"
 
 	"gitlab.com/NebulousLabs/errors"
 
+	spdBuild "gitlab.com/scpcorp/ScPrime/build"
 	"gitlab.com/scpcorp/ScPrime/crypto"
 	"gitlab.com/scpcorp/ScPrime/modules"
 	"gitlab.com/scpcorp/ScPrime/modules/downloader"
@@ -133,6 +135,13 @@ func transctionHistoryCsvExportHelper() (string, error) {
 		}
 	}
 	return csv, nil
+}
+
+func privacyHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	sessionID := req.FormValue("session_id")
+	html := resources.WalletHTMLTemplate()
+	html = strings.Replace(html, "&TRANSACTION_PORTAL;", resources.PrivacyHTMLTemplate(), -1)
+	writeHTML(w, html, sessionID)
 }
 
 func alertChangeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -714,11 +723,6 @@ func writeWallet(w http.ResponseWriter, sessionID string) {
 		}
 		options = fmt.Sprintf("<option %s value='%d'>%d</option>", selected, i+1, i+1) + options
 	}
-	if pages == 0 {
-		html = strings.Replace(html, "&TRANSACTION_PAGINATION;", "<div class='col-4 center no-wrap'></div>", -1)
-	} else {
-		html = strings.Replace(html, "&TRANSACTION_PAGINATION;", resources.TransactionPaginationTemplate(), -1)
-	}
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGE;", options, -1)
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGES;", strconv.Itoa(pages+1), -1)
 	writeHTML(w, html, sessionID)
@@ -757,6 +761,8 @@ func writeForm(w http.ResponseWriter, title string, form string, sessionID strin
 
 func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	cachedPage(html, sessionID)
+	html = strings.Replace(html, "&WEB_WALLET_VERSION;", build.Version, -1)
+	html = strings.Replace(html, "&SPD_VERSION;", spdBuild.Version, -1)
 	fmtHeight, fmtStatus, fmtStatCo := blockHeightHelper()
 	html = strings.Replace(html, "&STATUS_COLOR;", fmtStatCo, -1)
 	html = strings.Replace(html, "&STATUS;", fmtStatus, -1)
@@ -980,6 +986,7 @@ func transactionHistoryHelper(sessionID string) (string, int, error) {
 				}
 				row := resources.TransactionHistoryLineHTMLTemplate()
 				row = strings.Replace(row, "&TRANSACTION_ID;", txn.TxnId, -1)
+				row = strings.Replace(row, "&SHORT_TRANSACTION_ID;", txn.TxnId[0:16]+"..."+txn.TxnId[len(txn.TxnId)-16:], -1)
 				row = strings.Replace(row, "&TYPE;", txn.Type, -1)
 				row = strings.Replace(row, "&TIME;", txn.Time, -1)
 				row = strings.Replace(row, "&AMOUNT;", fmtAmount, -1)

@@ -1,4 +1,4 @@
-    <h2 class="center">Recent Transactions:</h2>
+    <h2 class="center blue-bg">Transactions</h2>
     <div class="grid">
       <ul class="row">
         <h3 class="col-5 center no-wrap">
@@ -23,6 +23,12 @@
         <div class="col-5 center no-wrap"></div>
         <div class="col-5 center no-wrap"></div>
         <div class="col-5 center no-wrap"></div>
-        &TRANSACTION_PAGINATION;
       </ul>
     </div>
+    <h3 class="center blue-bg">
+      <form action="/gui/setTxHistoryPage?&CACHE_BUSTER;" method="post">
+        <input type="hidden" name="session_id" value="&SESSION_ID;">
+        Page <select name='page'>&TRANSACTION_HISTORY_PAGE;</select> of &TRANSACTION_HISTORY_PAGES;
+        <input type="submit" value="Go">
+      </form>
+    </h3>
