@@ -18,6 +18,7 @@ count = 1
 # tests are run during testing.
 pkgs = \
 	./cmd/scp-webwallet \
+	./daemon \
 	./resources \
 	./server
 

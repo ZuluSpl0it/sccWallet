@@ -18,16 +18,12 @@ func configNodeParams() node.NodeParams {
 	params.CreateConsensusSet = true
 	params.CreateTransactionPool = true
 	params.CreateWallet = true
-	params.CreateDownloader = true
-	params.CreateGui = false
+	params.CreateDownloader = true // set to true when new wallets should bootstrap consensus
 	// Parse remaining fields.
-	params.Bootstrap = true
-	params.SiaMuxTCPAddress = ":4303"
-	params.SiaMuxWSAddress = ":4304"
+	params.Bootstrap = true // set to true when the gateway should use the bootstrap peer list
 	params.Dir = defaultScPrimeUIDir()
 	params.APIaddr = "localhost:4300"
 	params.CheckTokenExpirationFrequency = 1 * time.Hour // default
-	params.Headless = true
 	return params
 }
 

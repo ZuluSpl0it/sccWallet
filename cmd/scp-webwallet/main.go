@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"gitlab.com/scpcorp/webwallet/daemon"
 )
 
 // exit codes
@@ -21,9 +23,13 @@ func die(args ...interface{}) {
 
 // main starts the daemon.
 func main() {
+	// configure the the node params.
+	params := configNodeParams()
+	// Launch the GUI
+	go launch("http://" + params.APIaddr)
 	// Start the ScPrime web wallet daemon.
 	// the startDaemon method will only return when it is shutting down.
-	err := startDaemon()
+	err := daemon.StartDaemon(params)
 	if err != nil {
 		die(err)
 	}

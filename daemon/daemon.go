@@ -1,4 +1,4 @@
-package main
+package daemon
 
 import (
 	"fmt"
@@ -12,8 +12,6 @@ import (
 	"gitlab.com/scpcorp/ScPrime/build"
 	"gitlab.com/scpcorp/ScPrime/node"
 )
-
-var n *node.Node
 
 // printVersionAndRevision prints the daemon's version and revision numbers.
 func printVersionAndRevision() {
@@ -58,22 +56,22 @@ func installKillSignalHandler() chan os.Signal {
 	return sigChan
 }
 
-func startNode(nodeParams node.NodeParams, loadStart time.Time) {
+func startNode(nodeParams node.NodeParams, loadStart time.Time) *node.Node {
 	node, err := newNode(nodeParams)
 	if err != nil {
 		fmt.Println("Server is unable to create the ScPrime node.")
 		fmt.Println(err)
-		return
+		return nil
 	}
 	server.AttachNode(node)
-	n = node
 	// Print a 'startup complete' message.
 	startupTime := time.Since(loadStart)
 	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
+	return node
 }
 
-// startDaemon uses the config parameters to initialize modules and start the web wallet.
-func startDaemon() (err error) {
+// StartDaemon uses the config parameters to initialize modules and start the web wallet.
+func StartDaemon(nodeParams node.NodeParams) (err error) {
 	// Record startup time
 	loadStart := time.Now()
 
@@ -90,17 +88,11 @@ func startDaemon() (err error) {
 	// Print a startup message.
 	fmt.Println("Loading ScPrime Web Wallet...")
 
-	// configure the the node params.
-	nodeParams := configNodeParams()
-
-	// Start a node
-	go startNode(nodeParams, loadStart)
-
-	// Launch the GUI
-	go launch("http://" + nodeParams.APIaddr)
-
 	// Start Server
 	server.StartHTTPServer(nodeParams.APIaddr)
+
+	// Start a node
+	node := startNode(nodeParams, loadStart)
 
 	select {
 	case <-server.Wait():
@@ -110,8 +102,8 @@ func startDaemon() (err error) {
 	}
 
 	// Close
-	if n != nil {
-		n.Close()
+	if node != nil {
+		node.Close()
 	}
 	return nil
 }

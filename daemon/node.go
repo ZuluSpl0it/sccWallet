@@ -1,4 +1,4 @@
-package main
+package daemon
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ import (
 )
 
 func newNode(params node.NodeParams) (*node.Node, error) {
-	numModules := 5
+	numModules := params.NumModules()
 	i := 0
 	fmt.Println("Starting modules:")
 	// Make sure the path is an absolute one.
@@ -28,6 +28,9 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	// Downloader
 	loadStart := time.Now()
 	d := func() modules.Downloader {
+		if !params.CreateDownloader {
+			return nil
+		}
 		i++
 		fmt.Printf("(%d/%d) Downloading consensus...", i, numModules)
 		return downloader.New(params.Dir)
@@ -42,6 +45,9 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	// Gateway.
 	loadStart = time.Now()
 	g, err := func() (modules.Gateway, error) {
+		if !params.CreateGateway {
+			return nil, nil
+		}
 		if params.RPCAddress == "" {
 			params.RPCAddress = "localhost:0"
 		}
@@ -64,6 +70,9 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	cs, errChanCS := func() (modules.ConsensusSet, <-chan error) {
 		c := make(chan error, 1)
 		defer close(c)
+		if !params.CreateConsensusSet {
+			return nil, c
+		}
 		i++
 		fmt.Printf("(%d/%d) Loading consensus...", i, numModules)
 		consensusSetDeps := params.ConsensusSetDeps
@@ -81,6 +90,9 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	// Transaction Pool
 	loadStart = time.Now()
 	tp, err := func() (modules.TransactionPool, error) {
+		if !params.CreateTransactionPool {
+			return nil, nil
+		}
 		i++
 		fmt.Printf("(%d/%d) Loading transaction pool...", i, numModules)
 		tpoolDeps := params.TPoolDeps
@@ -98,6 +110,9 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	// Wallet
 	loadStart = time.Now()
 	w, err := func() (modules.Wallet, error) {
+		if !params.CreateWallet {
+			return nil, nil
+		}
 		walletDeps := params.WalletDeps
 		if walletDeps == nil {
 			walletDeps = modules.ProdDependencies
