@@ -1,5 +1,6 @@
 # [![ScPrime WebWallet](https://scpri.me/imagestore/SPRho_256x256.png)](http://scpri.me)
 
+[![Latest Release](https://gitlab.com/scpcorp/webwallet/-/badges/release.svg)](https://gitlab.com/scpcorp/webwallet/-/tags)
 [![Build Status](https://gitlab.com/scpcorp/webwallet/badges/main/pipeline.svg)](https://gitlab.com/scpcorp/webwallet/commits/main)
 [![GoDoc](https://godoc.org/gitlab.com/scpcorp/webwallet?status.svg)](https://godoc.org/gitlab.com/scpcorp/webwallet)
 [![Go Report Card](https://goreportcard.com/badge/gitlab.com/scpcorp/webwallet)](https://goreportcard.com/report/gitlab.com/scpcorp/webwallet)
