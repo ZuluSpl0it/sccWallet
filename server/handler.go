@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"gitlab.com/scpcorp/webwallet/build"
+	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
 	"gitlab.com/scpcorp/webwallet/resources"
 
 	"gitlab.com/NebulousLabs/errors"
@@ -20,7 +21,6 @@ import (
 	spdBuild "gitlab.com/scpcorp/ScPrime/build"
 	"gitlab.com/scpcorp/ScPrime/crypto"
 	"gitlab.com/scpcorp/ScPrime/modules"
-	"gitlab.com/scpcorp/ScPrime/modules/downloader"
 	"gitlab.com/scpcorp/ScPrime/modules/wallet"
 	"gitlab.com/scpcorp/ScPrime/types"
 
@@ -53,8 +53,8 @@ func blockHeightHandler(w http.ResponseWriter, req *http.Request, _ httprouter.P
 	writeArray(w, []string{fmtHeight, fmtStatus, fmtStatCo})
 }
 
-func downloaderProgressHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	writeArray(w, []string{downloader.Progress()})
+func bootstrapperProgressHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	writeArray(w, []string{bootstrapper.Progress()})
 }
 
 func heartbeatHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -584,8 +584,8 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	writeHTML(w, html, sessionID)
 }
 
-func downloadingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	html := strings.Replace(resources.DownloadingHTML(), "&DOWNLOADER_PROGRESS;", downloader.Progress(), -1)
+func bootstrappingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	html := strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", bootstrapper.Progress(), -1)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, html)
 }

@@ -56,9 +56,9 @@ function refreshBalance() {
     setTimeout(() => {refreshBalance();}, 5000);
   }
 }
-function refreshDownloaderProgress() {
-  if (document.getElementsByClassName('downloader-progress').length > 0) {
-    fetch("/gui/downloaderProgress")
+function refreshBootstrapperProgress() {
+  if (document.getElementsByClassName('bootstrapper-progress').length > 0) {
+    fetch("/gui/bootstrapperProgress")
       .then(response => response.json())
       .then(result => {
         var status = result[0]
@@ -66,20 +66,20 @@ function refreshDownloaderProgress() {
         if (status === "100%") {
           var pathname = location.pathname
           if (pathname === "/") {
-            document.getElementById("refreshDownloader").submit(); 
+            document.getElementById("refreshBootstrapper").submit(); 
           }
         }
-        for (const element of document.getElementsByClassName("downloader-progress")){
+        for (const element of document.getElementsByClassName("bootstrapper-progress")){
           element.innerHTML = status;
         }
-        setTimeout(() => {refreshDownloaderProgress();}, 1000);
+        setTimeout(() => {refreshBootstrapperProgress();}, 1000);
       })
       .catch(error => {
         console.error("Error:", error);
-        setTimeout(() => {refreshDownloaderProgress();}, 1000);
+        setTimeout(() => {refreshBootstrapperProgress();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshDownloaderProgress();}, 1000);
+    setTimeout(() => {refreshBootstrapperProgress();}, 1000);
   }
 }
 function refreshHeartbeat() {
@@ -108,7 +108,7 @@ function shutdownNotice() {
     <div id="fade" class="fade"></div>
   `
 }
-refreshDownloaderProgress()
+refreshBootstrapperProgress()
 refreshBlockHeight()
 refreshBalance()
 refreshHeartbeat()

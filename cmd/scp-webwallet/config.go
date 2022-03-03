@@ -18,7 +18,6 @@ func configNodeParams() node.NodeParams {
 	params.CreateConsensusSet = true
 	params.CreateTransactionPool = true
 	params.CreateWallet = true
-	params.CreateDownloader = true // set to true when new wallets should bootstrap consensus
 	// Parse remaining fields.
 	params.Bootstrap = true // set to true when the gateway should use the bootstrap peer list
 	params.Dir = defaultScPrimeUIDir()

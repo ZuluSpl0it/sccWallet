@@ -7,41 +7,33 @@ import (
 
 	"gitlab.com/scpcorp/ScPrime/modules"
 	"gitlab.com/scpcorp/ScPrime/modules/consensus"
-	"gitlab.com/scpcorp/ScPrime/modules/downloader"
 	"gitlab.com/scpcorp/ScPrime/modules/gateway"
 	"gitlab.com/scpcorp/ScPrime/modules/transactionpool"
 	"gitlab.com/scpcorp/ScPrime/modules/wallet"
 	"gitlab.com/scpcorp/ScPrime/node"
 
+	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
 	"gitlab.com/scpcorp/webwallet/server"
 )
 
 func newNode(params node.NodeParams) (*node.Node, error) {
-	numModules := params.NumModules()
-	i := 0
+	numModules := params.NumModules() + 1
+	i := 1
 	fmt.Println("Starting modules:")
 	// Make sure the path is an absolute one.
 	dir, err := filepath.Abs(params.Dir)
 	if err != nil {
 		return nil, err
 	}
-	// Downloader
+	// Bootstraper
 	loadStart := time.Now()
-	d := func() modules.Downloader {
-		if !params.CreateDownloader {
-			return nil
-		}
-		i++
-		fmt.Printf("(%d/%d) Downloading consensus...", i, numModules)
-		return downloader.New(params.Dir)
-	}()
-	if d != nil {
-		loadTime := time.Since(loadStart).Seconds()
-		if loadTime < .0001 {
-			loadTime = .0001
-		}
-		fmt.Println(" done in", loadTime, "seconds.")
+	fmt.Printf("(%d/%d) Bootstrapping consensus...", i, numModules)
+	bootstrapper.Start(params.Dir)
+	loadTime := time.Since(loadStart).Seconds()
+	if loadTime < .0001 {
+		loadTime = .0001
 	}
+	fmt.Println(" done in", loadTime, "seconds.")
 	// Gateway.
 	loadStart = time.Now()
 	g, err := func() (modules.Gateway, error) {
@@ -132,7 +124,6 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 		Gateway:         g,
 		TransactionPool: tp,
 		Wallet:          w,
-		Downloader:      d,
 		Dir:             dir,
 	}
 	server.AttachNode(node)
