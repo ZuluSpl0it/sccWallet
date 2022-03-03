@@ -16,8 +16,8 @@ var cssStyleSheet []byte
 //go:embed resources/scripts.js
 var javascript []byte
 
-//go:embed resources/downloading.html
-var downloadingHTML string
+//go:embed resources/bootstrapping.html
+var bootstrappingHTML string
 
 //go:embed resources/loading.html
 var loadingHTML []byte
@@ -102,9 +102,9 @@ func Javascript() []byte {
 	return javascript
 }
 
-// DownloadingHTML returns an html page
-func DownloadingHTML() string {
-	return downloadingHTML
+// BootstrappingHTML returns an html page
+func BootstrappingHTML() string {
+	return bootstrappingHTML
 }
 
 // LoadingHTML returns an html page
