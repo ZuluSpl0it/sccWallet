@@ -828,20 +828,21 @@ func blockHeightHelper() (string, string, string) {
 	} else {
 		fmtHeight = fmt.Sprintf("%d", height)
 	}
+	if status != "" {
+		return fmtHeight, status, "yellow"
+	}
 	rescanning, err := n.Wallet.Rescanning()
 	if err != nil {
 		fmt.Printf("Unable to determine if wallet is being scanned: %v", err)
 	}
-	synced := n.ConsensusSet.Synced()
-	if status != "" {
-		return fmtHeight, status, "yellow"
-	} else if rescanning {
+	if rescanning {
 		return fmtHeight, "Rescanning", "cyan"
-	} else if synced {
-		return fmtHeight, "Synchronized", "blue"
-	} else {
-		return fmtHeight, "Synchronizing", "yellow"
 	}
+	synced := n.ConsensusSet.Synced()
+	if synced {
+		return fmtHeight, "Synchronized", "blue"
+	}
+	return fmtHeight, "Synchronizing", "yellow"
 }
 
 func initializeSeedHelper(newPassword string) {
