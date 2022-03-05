@@ -505,12 +505,14 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	guiHandler(w, req, nil)
 }
 
-func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	password := req.FormValue("password")
+func unlockWalletHelper(password string, sessionID string) {
 	var msgPrefix = "Unable to unlock wallet: "
 	if password == "" {
 		msg := "A password must be provided."
-		writeError(w, msgPrefix+msg, "")
+		setAlert(msgPrefix+msg, sessionID)
+		if status == "Scanning" {
+			status = ""
+		}
 		return
 	}
 	potentialKeys, _ := encryptionKeys(password)
@@ -518,7 +520,7 @@ func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 		unlocked, err := n.Wallet.Unlocked()
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
-			writeError(w, msg, "")
+			setAlert(msg, sessionID)
 			return
 		}
 		if !unlocked {
@@ -528,15 +530,25 @@ func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 	unlocked, err := n.Wallet.Unlocked()
 	if err != nil {
 		msg := fmt.Sprintf("%s%v", msgPrefix, err)
-		writeError(w, msg, "")
+		setAlert(msg, sessionID)
+		if status == "Scanning" {
+			status = ""
+		}
 		return
 	}
 	if !unlocked {
 		msg := msgPrefix + "Password is not valid."
-		writeError(w, msg, "")
-		return
+		setAlert(msg, sessionID)
 	}
+	status = ""
+}
+
+func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	password := req.FormValue("password")
 	sessionID := addSessionID()
+	status = "Scanning"
+	go unlockWalletHelper(password, sessionID)
+	time.Sleep(300 * time.Millisecond)
 	if status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 		form := resources.ScanningWalletForm()
@@ -760,6 +772,10 @@ func writeForm(w http.ResponseWriter, title string, form string, sessionID strin
 }
 
 func writeHTML(w http.ResponseWriter, html string, sessionID string) {
+	if hasAlert(sessionID) {
+		writeError(w, popAlert(sessionID), sessionID)
+		return
+	}
 	cachedPage(html, sessionID)
 	html = strings.Replace(html, "&WEB_WALLET_VERSION;", build.Version, -1)
 	html = strings.Replace(html, "&SPD_VERSION;", spdBuild.Version, -1)

@@ -23,6 +23,7 @@ var (
 // Session is a struct that tracks session settings
 type Session struct {
 	id            string
+	alert         string
 	collapseMenu  bool
 	txHistoryPage int
 	cachedPage    string
@@ -89,6 +90,37 @@ func sessionIDExists(sessionID string) bool {
 		}
 	}
 	return false
+}
+
+// setAlert sets an alert on the session.
+func setAlert(alert string, sessionID string) {
+	for _, session := range sessions {
+		if session.id == sessionID {
+			session.alert = alert
+		}
+	}
+}
+
+// hasAlert returns true when the session has an alert.
+func hasAlert(sessionID string) bool {
+	for _, session := range sessions {
+		if session.id == sessionID {
+			return session.alert != ""
+		}
+	}
+	return false
+}
+
+// popAlert gets the alert from the session and then clears it from the session.
+func popAlert(sessionID string) string {
+	for _, session := range sessions {
+		if session.id == sessionID {
+			alert := session.alert
+			session.alert = ""
+			return alert
+		}
+	}
+	return ""
 }
 
 // collapseMenu sets the menu state to collapsed and returns true
