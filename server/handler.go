@@ -596,21 +596,15 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	writeHTML(w, html, sessionID)
 }
 
+func skipBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	bootstrapper.Skip()
+	guiHandler(w, req, nil)
+}
+
 func bootstrappingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	html := strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", bootstrapper.Progress(), -1)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, html)
-}
-
-func loadingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	var body = resources.LoadingHTML()
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Content-Length", strconv.Itoa(len(body))) //len(dec)
-	w.Write(body)
-}
-
-func notLoadedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	writeArray(w, []string{"The GUI module is not loaded."})
 }
 
 func expandMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -671,6 +665,9 @@ func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.P
 }
 
 func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	for n == nil || n.Wallet == nil {
+		time.Sleep(100 * time.Millisecond)
+	}
 	sessionID := req.FormValue("session_id")
 	height, _, _ := blockHeightHelper()
 	if height == "0" && status != "" {
@@ -925,6 +922,7 @@ func shutdownHelper() {
 	time.Sleep(5000 * time.Millisecond)
 	if time.Now().After(heartbeat.Add(5000 * time.Millisecond)) {
 		fmt.Println("Heartbeat expired.")
+		bootstrapper.Skip()
 		srv.Shutdown(context.Background())
 	}
 }

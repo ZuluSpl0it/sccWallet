@@ -19,9 +19,6 @@ var javascript []byte
 //go:embed resources/bootstrapping.html
 var bootstrappingHTML string
 
-//go:embed resources/loading.html
-var loadingHTML []byte
-
 //go:embed resources/wallet_template.html
 var walletHTMLTemplate string
 
@@ -105,11 +102,6 @@ func Javascript() []byte {
 // BootstrappingHTML returns an html page
 func BootstrappingHTML() string {
 	return bootstrappingHTML
-}
-
-// LoadingHTML returns an html page
-func LoadingHTML() []byte {
-	return loadingHTML
 }
 
 // WalletHTMLTemplate returns the wallet html template
