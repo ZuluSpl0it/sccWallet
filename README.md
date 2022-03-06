@@ -13,6 +13,14 @@ Usage
 
 Online documentation available at https://docs.scpri.me/software/webwallet
 
+Environment Variables
+---------------------
+
+You can configure the web wallet to persist and retrieve application data to a specific directory by setting the `SCPRIME_WEB_WALLET_DATA_DIR` environment variable to the desired directory path. If this environment variable is not set then a default directory will be determined according to your operating system as follows:
+  * Linux:   `$HOME/.scprime-webwallet`
+  * MacOS:   `$HOME/Library/Application Support/ScPrime-WebWallet`
+  * Windows: `%LOCALAPPDATA%\ScPrime-WebWallet`
+
 Building From Source
 --------------------
 
