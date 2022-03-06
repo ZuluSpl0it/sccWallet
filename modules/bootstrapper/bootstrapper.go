@@ -15,6 +15,12 @@ import (
 )
 
 var status = "N/A"
+var skip = false
+
+// Skip bootstrapping consensus from consensus.scpri.me
+func Skip() {
+	skip = true
+}
 
 // Progress returns the bootstrapper's progress as a percentage.
 func Progress() string {
@@ -65,6 +71,9 @@ func Start(dataDir string) {
 			break
 		}
 		time.Sleep(1 * time.Second)
+	}
+	if skip {
+		return
 	}
 	status = `99%`
 	decompress(tmp.Name(), consensusDb)
@@ -136,6 +145,9 @@ func consensusDownload(target string) error {
 				break
 			}
 			return err
+		}
+		if skip {
+			break
 		}
 	}
 	out.Close()

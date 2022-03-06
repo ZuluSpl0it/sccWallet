@@ -3,14 +3,14 @@ function refreshBlockHeight() {
     fetch("/gui/blockHeight")
       .then(response => response.json())
       .then(result => {
-        var blockHeight = result[0];
+        var blockHeight = result[0]
         var status = result[1]
         var color = result[2]
-        // Autorefresh wallet to make onboarding smoother.
+        // Automatically refresh form to make GUI smoother.
         if (status === "Synchronized") {
-          var pathname = location.pathname
-          if (pathname === "/gui/initializeSeed" || pathname === "/gui/restoreSeed") {
-            document.getElementById("refreshScanner").submit(); 
+          var refreshForm = document.getElementById("refreshForm")
+          if (typeof(refreshForm) != 'undefined' && refreshForm != null) {
+            refreshForm.submit()
           }
         }
         for (const element of document.getElementsByClassName("block_height")){
@@ -22,14 +22,14 @@ function refreshBlockHeight() {
         for (const element of document.getElementsByClassName("status")){
           element.className="status " + color
         }
-        setTimeout(() => {refreshBlockHeight();}, 5000);
+        setTimeout(() => {refreshBlockHeight();}, 1000);
       })
       .catch(error => {
         console.error("Error:", error);
-        setTimeout(() => {refreshBlockHeight();}, 5000);
+        setTimeout(() => {refreshBlockHeight();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBlockHeight();}, 5000);
+    setTimeout(() => {refreshBlockHeight();}, 1000);
   }
 }
 function refreshBalance() {
@@ -46,14 +46,14 @@ function refreshBalance() {
         for (const element of document.getElementsByClassName("spf_funds")){
           element.innerHTML=result[2];
         }
-        setTimeout(() => {refreshBalance();}, 5000);
+        setTimeout(() => {refreshBalance();}, 1000);
       })
       .catch(error => {
         console.error("Error:", error);
-        setTimeout(() => {refreshBalance();}, 5000);
+        setTimeout(() => {refreshBalance();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBalance();}, 5000);
+    setTimeout(() => {refreshBalance();}, 1000);
   }
 }
 function refreshBootstrapperProgress() {
@@ -66,7 +66,10 @@ function refreshBootstrapperProgress() {
         if (status === "100%") {
           var pathname = location.pathname
           if (pathname === "/") {
-            document.getElementById("refreshBootstrapper").submit(); 
+            var refreshBootstrapper = document.getElementById("refreshBootstrapper")
+            if (typeof(refreshBootstrapper) != 'undefined' && refreshBootstrapper != null) {
+              refreshBootstrapper.submit()
+            }
           }
         }
         for (const element of document.getElementsByClassName("bootstrapper-progress")){

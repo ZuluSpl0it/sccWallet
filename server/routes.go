@@ -24,6 +24,7 @@ func buildHTTPRoutes() *httprouter.Router {
 	router.GET("/gui/fonts/open-sans-v27-latin-700.woff2", openSansLatin700Woff2Handler)
 	if n == nil {
 		router.GET("/", bootstrappingHandler)
+		router.GET("/skipBootstrapper", skipBootstrapperHandler)
 	} else {
 		router.GET("/", guiHandler)
 		router.GET("/gui", guiHandler)
