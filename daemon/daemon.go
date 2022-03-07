@@ -95,7 +95,7 @@ func StartDaemon(nodeParams node.NodeParams) (err error) {
 	fmt.Println("Loading ScPrime Web Wallet...")
 
 	// Start Server
-	server.StartHTTPServer(nodeParams.APIaddr)
+	server.StartHTTPServer()
 
 	// Start a node
 	node := startNode(nodeParams, loadStart)

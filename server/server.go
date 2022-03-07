@@ -30,10 +30,10 @@ type Session struct {
 }
 
 // StartHTTPServer starts the HTTP server to serve the GUI.
-func StartHTTPServer(addr string) {
+func StartHTTPServer() {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	srv = &http.Server{Addr: addr, Handler: buildHTTPRoutes()}
+	srv = &http.Server{Addr: ":4300", Handler: buildHTTPRoutes()}
 	go func() {
 		defer wg.Done()
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {

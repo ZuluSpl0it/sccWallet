@@ -130,7 +130,7 @@ func transctionHistoryCsvExportHelper() (string, error) {
 			if fmtSpf == "" {
 				fmtSpf = "0"
 			}
-			csv = csv + fmt.Sprintf(`"%s","%s","%s","%s","%s","%s"`, txn.TxnId, txn.Type, txn.Scp, fmtSpf, txn.Confirmed, txn.Time) + "\n"
+			csv = csv + fmt.Sprintf(`"%s","%s","%s","%s","%s","%s"`, txn.TxnID, txn.Type, txn.Scp, fmtSpf, txn.Confirmed, txn.Time) + "\n"
 		}
 	}
 	return csv, nil
@@ -471,7 +471,7 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	}
 	coinType := req.FormValue("coin_type")
 	if coinType == "SCP" {
-		amount, err := types.NewCurrencyStr(req.FormValue("amount") + "SCP")
+		amount, err := NewCurrencyStr(req.FormValue("amount") + "SCP")
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
 			writeError(w, msg, sessionID)
@@ -484,7 +484,7 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 			return
 		}
 	} else if coinType == "SPF" {
-		amount, err := types.NewCurrencyStr(req.FormValue("amount") + "SPF")
+		amount, err := NewCurrencyStr(req.FormValue("amount") + "SPF")
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
 			writeError(w, msg, sessionID)
@@ -999,8 +999,8 @@ func transactionHistoryHelper(sessionID string) (string, int, error) {
 					fmtAmount = fmtAmount + "; " + txn.Spf
 				}
 				row := resources.TransactionHistoryLineHTMLTemplate()
-				row = strings.Replace(row, "&TRANSACTION_ID;", txn.TxnId, -1)
-				row = strings.Replace(row, "&SHORT_TRANSACTION_ID;", txn.TxnId[0:16]+"..."+txn.TxnId[len(txn.TxnId)-16:], -1)
+				row = strings.Replace(row, "&TRANSACTION_ID;", txn.TxnID, -1)
+				row = strings.Replace(row, "&SHORT_TRANSACTION_ID;", txn.TxnID[0:16]+"..."+txn.TxnID[len(txn.TxnID)-16:], -1)
 				row = strings.Replace(row, "&TYPE;", txn.Type, -1)
 				row = strings.Replace(row, "&TIME;", txn.Time, -1)
 				row = strings.Replace(row, "&AMOUNT;", fmtAmount, -1)

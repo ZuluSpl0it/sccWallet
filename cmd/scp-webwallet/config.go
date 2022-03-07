@@ -19,7 +19,6 @@ func configNodeParams() node.NodeParams {
 	// Parse remaining fields.
 	params.Bootstrap = true // set to true when the gateway should use the bootstrap peer list
 	params.Dir = build.ScPrimeWebWalletDir()
-	params.APIaddr = "localhost:4300"
 	params.CheckTokenExpirationFrequency = 1 * time.Hour // default
 	return params
 }
