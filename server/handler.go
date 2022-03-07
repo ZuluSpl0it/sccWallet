@@ -21,7 +21,6 @@ import (
 	spdBuild "gitlab.com/scpcorp/ScPrime/build"
 	"gitlab.com/scpcorp/ScPrime/crypto"
 	"gitlab.com/scpcorp/ScPrime/modules"
-	"gitlab.com/scpcorp/ScPrime/modules/wallet"
 	"gitlab.com/scpcorp/ScPrime/types"
 
 	"github.com/julienschmidt/httprouter"
@@ -120,7 +119,7 @@ func transctionHistoryCsvExportHelper() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	sts, err := wallet.ComputeSummarizedTransactions(append(confirmedTxns, unconfirmedTxns...), n.ConsensusSet.Height())
+	sts, err := ComputeSummarizedTransactions(append(confirmedTxns, unconfirmedTxns...), n.ConsensusSet.Height())
 	if err != nil {
 		return "", err
 	}
@@ -985,7 +984,7 @@ func transactionHistoryHelper(sessionID string) (string, int, error) {
 	if err != nil {
 		return "", -1, err
 	}
-	sts, err := wallet.ComputeSummarizedTransactions(append(confirmedTxns, unconfirmedTxns...), n.ConsensusSet.Height())
+	sts, err := ComputeSummarizedTransactions(append(confirmedTxns, unconfirmedTxns...), n.ConsensusSet.Height())
 	if err != nil {
 		return "", -1, err
 	}
