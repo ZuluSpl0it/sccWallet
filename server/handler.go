@@ -351,10 +351,10 @@ func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httproute
 		writeError(w, msg, "")
 		return
 	}
-	go initializeSeedHelper(newPassword)
+	sessionID := addSessionID()
+	go initializeSeedHelper(newPassword, sessionID)
 	title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 	form := resources.ScanningWalletForm()
-	sessionID := addSessionID()
 	writeForm(w, title, form, sessionID)
 }
 
@@ -432,10 +432,10 @@ func restoreSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		writeError(w, msg, "")
 		return
 	}
-	go restoreSeedHelper(newPassword, seed)
+	sessionID := addSessionID()
+	go restoreSeedHelper(newPassword, seed, sessionID)
 	title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
 	form := resources.ScanningWalletForm()
-	sessionID := addSessionID()
 	writeForm(w, title, form, sessionID)
 }
 
@@ -520,6 +520,9 @@ func unlockWalletHelper(password string, sessionID string) {
 		if err != nil {
 			msg := fmt.Sprintf("%s%v", msgPrefix, err)
 			setAlert(msg, sessionID)
+			if status == "Scanning" {
+				status = ""
+			}
 			return
 		}
 		if !unlocked {
@@ -857,19 +860,27 @@ func blockHeightHelper() (string, string, string) {
 	return fmtHeight, "Synchronizing", "yellow"
 }
 
-func initializeSeedHelper(newPassword string) {
+func initializeSeedHelper(newPassword string, sessionID string) {
 	setStatus("Initializing")
 	var encryptionKey crypto.CipherKey = crypto.NewWalletKey(crypto.HashObject(newPassword))
 	_, err := n.Wallet.Encrypt(encryptionKey)
 	if err != nil {
-		fmt.Printf("Unable to initialize new wallet seed: %v", err)
+		msg := fmt.Sprintf("Unable to initialize new wallet seed: %v", err)
+		setAlert(msg, sessionID)
+		if status == "Initializing" {
+			status = ""
+		}
 		return
 	}
 	potentialKeys, _ := encryptionKeys(newPassword)
 	for _, key := range potentialKeys {
 		unlocked, err := n.Wallet.Unlocked()
 		if err != nil {
-			fmt.Printf("Unable to initialize new wallet seed: %v", err)
+			msg := fmt.Sprintf("Unable to initialize new wallet seed: %v", err)
+			setAlert(msg, sessionID)
+			if status == "Initializing" {
+				status = ""
+			}
 			return
 		}
 		if !unlocked {
@@ -895,19 +906,27 @@ func isPasswordValid(password string) (bool, error) {
 	return false, err
 }
 
-func restoreSeedHelper(newPassword string, seed modules.Seed) {
+func restoreSeedHelper(newPassword string, seed modules.Seed, sessionID string) {
 	setStatus("Restoring")
 	var encryptionKey crypto.CipherKey = crypto.NewWalletKey(crypto.HashObject(newPassword))
 	err := n.Wallet.InitFromSeed(encryptionKey, seed)
 	if err != nil {
-		fmt.Printf("Unable to restore wallet seed: %v", err)
+		msg := fmt.Sprintf("Unable to restore wallet seed: %v", err)
+		setAlert(msg, sessionID)
+		if status == "Restoring" {
+			status = ""
+		}
 		return
 	}
 	potentialKeys, _ := encryptionKeys(newPassword)
 	for _, key := range potentialKeys {
 		unlocked, err := n.Wallet.Unlocked()
 		if err != nil {
-			fmt.Printf("Unable to initialize new wallet seed: %v", err)
+			msg := fmt.Sprintf("Unable to initialize new wallet seed: %v", err)
+			setAlert(msg, sessionID)
+			if status == "Restoring" {
+				status = ""
+			}
 			return
 		}
 		if !unlocked {
