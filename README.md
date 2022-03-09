@@ -24,7 +24,7 @@ You can configure the web wallet to persist and retrieve application data to a s
 Building From Source
 --------------------
 
-To build from source, [Go 1.17 or above must be installed](https://golang.org/doc/install) on the system. Clone the repo and run make:
+To build from source, [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run make. Example:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
@@ -44,4 +44,17 @@ Other Makefile commands are:
 * `make clean`, deletes and cruft from this code repository
 * `make test`, runs the test suite
 * `make code`, generates code coverage reports and saves them to this project's cover folder
+
+Building Release Binaries
+-------------------------
+
+To build the release binaries from source, sha1sum and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
+
+```sh
+git clone https://gitlab.com/scpcorp/webwallet
+cd webwallet && ./release-scripts/release.sh v0.1.0
+cd release
+```
+
+This will save the `scp-webwallet` release binaries to the webwallet's `./release` directory.
 
