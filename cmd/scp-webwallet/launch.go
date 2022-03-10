@@ -4,6 +4,8 @@ import (
 	"os/exec"
 	"runtime"
 	"time"
+
+	"github.com/pkg/browser"
 )
 
 // Browsers that are based on Chromium (such as Google Chrome and Microsoft Edge) are most
@@ -48,20 +50,15 @@ func darwin() bool {
 	if err == nil {
 		return true
 	}
-	err = exec.Command("open", "http://localhost:4300").Run()
+	err = browser.OpenURL("http://localhost:4300")
 	return err == nil
 }
 
 func windows() bool {
-	err := exec.Command("C:/Program Files/Google/Chrome/Application/chrome.exe", "--app=http://localhost:4300").Run()
-	if err == nil {
-		return true
-	}
-	err = exec.Command("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", "--app=http://localhost:4300").Run()
-	if err == nil {
-		return true
-	}
-	err = exec.Command("C:/Program Files/Microsoft/Edge/Application/msedge.exe", "--app=http://localhost:4300").Run()
+	// Edge is installed on all Windows OSes and can not be removed. It also can, like chrome, be
+	// launched in app mode which makes the experience feel like a native app. Thus, on Windows,
+	// lets default to launching Edge and only fall back to chrome on older versions of windows.
+	err := exec.Command("C:/Program Files/Microsoft/Edge/Application/msedge.exe", "--app=http://localhost:4300").Run()
 	if err == nil {
 		return true
 	}
@@ -69,16 +66,15 @@ func windows() bool {
 	if err == nil {
 		return true
 	}
-	// Firefox can no longer be launched without an address bar as the ssb parameter (site
-	// specific browser) was removed in 2021.
-	err = exec.Command("C:/Program Files/Mozilla Firefox/firefox.exe", "-new-window", "http://localhost:4300").Run()
+	err = exec.Command("C:/Program Files/Google/Chrome/Application/chrome.exe", "--app=http://localhost:4300").Run()
 	if err == nil {
 		return true
 	}
-	err = exec.Command("C:/Program Files (x86)/Mozilla Firefox/firefox.exe", "-new-window", "http://localhost:4300").Run()
+	err = exec.Command("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe", "--app=http://localhost:4300").Run()
 	if err == nil {
 		return true
 	}
+	err = browser.OpenURL("http://localhost:4300")
 	return err == nil
 }
 
@@ -141,6 +137,6 @@ func nix() bool {
 	if err == nil {
 		return true
 	}
-	err = exec.Command("xdg-open", "http://localhost:4300").Run()
+	err = browser.OpenURL("http://localhost:4300")
 	return err == nil
 }
