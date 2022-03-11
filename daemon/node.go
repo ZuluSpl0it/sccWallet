@@ -17,115 +17,143 @@ import (
 )
 
 func newNode(params node.NodeParams) (*node.Node, error) {
-	numModules := params.NumModules() + 1
-	i := 1
+	node := &node.Node{}
 	fmt.Println("Starting modules:")
 	// Make sure the path is an absolute one.
 	dir, err := filepath.Abs(params.Dir)
 	if err != nil {
 		return nil, err
 	}
-	// Bootstraper
-	loadStart := time.Now()
-	fmt.Printf("(%d/%d) Bootstrapping consensus...", i, numModules)
-	bootstrapper.Start(params.Dir)
-	loadTime := time.Since(loadStart).Seconds()
-	if loadTime < .0001 {
-		loadTime = .0001
-	}
-	fmt.Println(" done in", loadTime, "seconds.")
-	// Gateway.
-	loadStart = time.Now()
-	g, err := func() (modules.Gateway, error) {
-		if !params.CreateGateway {
-			return nil, nil
-		}
-		if params.RPCAddress == "" {
-			params.RPCAddress = "localhost:0"
-		}
-		gatewayDeps := params.GatewayDeps
-		if gatewayDeps == nil {
-			gatewayDeps = modules.ProdDependencies
-		}
-		i++
-		fmt.Printf("(%d/%d) Loading gateway...", i, numModules)
-		return gateway.NewCustomGateway(params.RPCAddress, params.Bootstrap, filepath.Join(dir, modules.GatewayDir), gatewayDeps)
-	}()
+	node.Dir = dir
+	// Bootstrap Consensus Set if necessary
+	bootstrapConsensusSet(params)
+	// Load Gateway.
+	err = loadGateway(params, node)
 	if err != nil {
 		return nil, err
+	}
+	// Load Consensus Set
+	err = loadConsensusSet(params, node)
+	if err != nil {
+		return nil, err
+	}
+	// Load Transaction Pool
+	err = loadTransactionPool(params, node)
+	if err != nil {
+		return nil, err
+	}
+	// Load Wallet
+	err = loadWallet(params, node)
+	if err != nil {
+		return nil, err
+	}
+	server.AttachNode(node)
+	return node, nil
+}
+
+func bootstrapConsensusSet(params node.NodeParams) {
+	loadStart := time.Now()
+	fmt.Printf("Bootstrapping consensus...")
+	time.Sleep(1 * time.Millisecond)
+	bootstrapper.Start(params.Dir)
+	loadTime := time.Since(loadStart).Seconds()
+	fmt.Println(" done in", loadTime, "seconds.")
+}
+
+func loadGateway(params node.NodeParams, node *node.Node) error {
+	loadStart := time.Now()
+	if !params.CreateGateway {
+		return nil
+	}
+	if params.RPCAddress == "" {
+		params.RPCAddress = "localhost:0"
+	}
+	gatewayDeps := params.GatewayDeps
+	if gatewayDeps == nil {
+		gatewayDeps = modules.ProdDependencies
+	}
+	fmt.Printf("Loading gateway...")
+	dir := node.Dir
+	g, err := gateway.NewCustomGateway(params.RPCAddress, params.Bootstrap, filepath.Join(dir, modules.GatewayDir), gatewayDeps)
+	if err != nil {
+		return err
 	}
 	if g != nil {
 		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	}
-	// Consensus
-	loadStart = time.Now()
-	cs, errChanCS := func() (modules.ConsensusSet, <-chan error) {
-		c := make(chan error, 1)
-		defer close(c)
-		if !params.CreateConsensusSet {
-			return nil, c
-		}
-		i++
-		fmt.Printf("(%d/%d) Loading consensus...", i, numModules)
-		consensusSetDeps := params.ConsensusSetDeps
-		if consensusSetDeps == nil {
-			consensusSetDeps = modules.ProdDependencies
-		}
-		return consensus.NewCustomConsensusSet(g, params.Bootstrap, filepath.Join(dir, modules.ConsensusDir), consensusSetDeps)
-	}()
+	node.Gateway = g
+	return nil
+}
+
+func loadConsensusSet(params node.NodeParams, node *node.Node) error {
+	loadStart := time.Now()
+	c := make(chan error, 1)
+	defer close(c)
+	if !params.CreateConsensusSet {
+		return nil
+	}
+	fmt.Printf("Loading consensus set...")
+	consensusSetDeps := params.ConsensusSetDeps
+	if consensusSetDeps == nil {
+		consensusSetDeps = modules.ProdDependencies
+	}
+	g := node.Gateway
+	dir := node.Dir
+	cs, errChanCS := consensus.NewCustomConsensusSet(g, params.Bootstrap, filepath.Join(dir, modules.ConsensusDir), consensusSetDeps)
 	if err := modules.PeekErr(errChanCS); err != nil {
-		return nil, err
+		return err
 	}
 	if cs != nil {
 		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	}
-	// Transaction Pool
-	loadStart = time.Now()
-	tp, err := func() (modules.TransactionPool, error) {
-		if !params.CreateTransactionPool {
-			return nil, nil
-		}
-		i++
-		fmt.Printf("(%d/%d) Loading transaction pool...", i, numModules)
-		tpoolDeps := params.TPoolDeps
-		if tpoolDeps == nil {
-			tpoolDeps = modules.ProdDependencies
-		}
-		return transactionpool.NewCustomTPool(cs, g, filepath.Join(dir, modules.TransactionPoolDir), tpoolDeps)
-	}()
+	node.ConsensusSet = cs
+	return nil
+}
+
+func loadTransactionPool(params node.NodeParams, node *node.Node) error {
+	loadStart := time.Now()
+	if !params.CreateTransactionPool {
+		return nil
+	}
+	fmt.Printf("Loading transaction pool...")
+	tpoolDeps := params.TPoolDeps
+	if tpoolDeps == nil {
+		tpoolDeps = modules.ProdDependencies
+	}
+	cs := node.ConsensusSet
+	g := node.Gateway
+	dir := node.Dir
+	tp, err := transactionpool.NewCustomTPool(cs, g, filepath.Join(dir, modules.TransactionPoolDir), tpoolDeps)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if tp != nil {
 		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	}
-	// Wallet
-	loadStart = time.Now()
-	w, err := func() (modules.Wallet, error) {
-		if !params.CreateWallet {
-			return nil, nil
-		}
-		walletDeps := params.WalletDeps
-		if walletDeps == nil {
-			walletDeps = modules.ProdDependencies
-		}
-		i++
-		fmt.Printf("(%d/%d) Loading wallet...", i, numModules)
-		return wallet.NewCustomWallet(cs, tp, filepath.Join(dir, modules.WalletDir), walletDeps)
-	}()
+	node.TransactionPool = tp
+	return nil
+}
+
+func loadWallet(params node.NodeParams, node *node.Node) error {
+	loadStart := time.Now()
+	if !params.CreateWallet {
+		return nil
+	}
+	walletDeps := params.WalletDeps
+	if walletDeps == nil {
+		walletDeps = modules.ProdDependencies
+	}
+	fmt.Printf("Loading wallet...")
+	cs := node.ConsensusSet
+	tp := node.TransactionPool
+	dir := node.Dir
+	w, err := wallet.NewCustomWallet(cs, tp, filepath.Join(dir, modules.WalletDir), walletDeps)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if w != nil {
 		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	}
-	node := &node.Node{
-		ConsensusSet:    cs,
-		Gateway:         g,
-		TransactionPool: tp,
-		Wallet:          w,
-		Dir:             dir,
-	}
-	server.AttachNode(node)
-	return node, nil
+	node.Wallet = w
+	return nil
 }
