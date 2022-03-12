@@ -14,12 +14,20 @@ import (
 	"time"
 )
 
-var status = "N/A"
+var status = ""
 var skip = false
+var initialize = false
 
 // Skip bootstrapping consensus from consensus.scpri.me
 func Skip() {
 	skip = true
+	status = "Skipped"
+}
+
+// Initialize bootstrapping consensus from consensus.scpri.me
+func Initialize() {
+	initialize = true
+	status = "0%"
 }
 
 // Progress returns the bootstrapper's progress as a percentage.
@@ -42,8 +50,12 @@ func Start(dataDir string) {
 	}
 	_, err = os.Stat(consensusDb)
 	if !errors.Is(err, os.ErrNotExist) {
-		// Consensus database already exists so there is no need to download it.
+		// Consensus database already exists so there is no need to bootstrap it.
 		return
+	}
+	// Consensus does not exist. Block until user chooses to bootstrap it or build it.
+	for status == "" {
+		time.Sleep(1 * time.Second)
 	}
 	size, err := consensusSize()
 	if size == 0 || err != nil {

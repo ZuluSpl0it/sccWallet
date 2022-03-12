@@ -94,6 +94,7 @@ function refreshHeartbeat() {
     	}
     })
     .catch(error => {
+      console.error("Error:", error);
       shutdownNotice()
     })
 }

@@ -46,6 +46,9 @@ var transactionOutputTemplate string
 //go:embed resources/forms/close_alert.html
 var closeAlertForm string
 
+//go:embed resources/initialize_consensus_set.html
+var initializeConsensusSetForm string
+
 //go:embed resources/forms/initialize_seed.html
 var intializeSeedForm string
 
@@ -147,6 +150,11 @@ func TransactionOutputTemplate() string {
 // CloseAlertForm returns the close alert form
 func CloseAlertForm() string {
 	return closeAlertForm
+}
+
+// InitializeConsensusSetForm returns the initialize consensus set form
+func InitializeConsensusSetForm() string {
+	return initializeConsensusSetForm
 }
 
 // IntializeSeedForm returns the initialize seed form
