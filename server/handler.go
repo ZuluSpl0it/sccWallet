@@ -598,13 +598,24 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	writeHTML(w, html, sessionID)
 }
 
+func initializeBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	bootstrapper.Initialize()
+	bootstrappingHandler(w, req, nil)
+}
+
 func skipBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	bootstrapper.Skip()
 	guiHandler(w, req, nil)
 }
 
 func bootstrappingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	html := strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", bootstrapper.Progress(), -1)
+	html := ""
+	progress := bootstrapper.Progress()
+	if progress == "" {
+		html = resources.InitializeConsensusSetForm()
+	} else {
+		html = strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", progress, -1)
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, html)
 }

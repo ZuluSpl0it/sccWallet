@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ScPrime Web Wallet</title>
+    <link rel="stylesheet" href="/gui/styles.css">
+    <script type="text/javascript" src="/gui/scripts.js"></script>
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  </head>
+  <body>
+    <div class="col-5 left top no-wrap">
+      <div>
+        <img class="scprime-logo" alt="ScPrime Web Wallet" src="/gui/logo.png"/>
+      </div>
+    </div>
+    <div id="popup" class="popup center">
+      <h2 class="uppercase">CONSENSUS SET NOT FOUND</h2>
+      <div class="middle pad blue-dashed" id="popup_content">
+        Consensus set was not found. Would you like to bootstrap the consensus set from https://consensus.scpri.me or build a consensus set from a peer pool of full nodes?
+      </div>
+      <form class="inline-block" action="/initializeBootstrapper?&CACHE_BUSTER;" method="get">
+        <button type="submit">Bootstrap</button>
+      </form>
+      <form class="inline-block" action="/skipBootstrapper?&CACHE_BUSTER;" method="get">
+        <button type="submit">Build</button>
+      </form>
+    </div>
+    <div id="fade" class="fade"></div>
+  </body>
+</html>
