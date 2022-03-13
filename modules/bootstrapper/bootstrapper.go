@@ -4,35 +4,46 @@ import (
 	"archive/zip"
 	"errors"
 	"fmt"
-	"gitlab.com/scpcorp/ScPrime/modules"
-	"gitlab.com/scpcorp/ScPrime/modules/consensus"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
+
+	"gitlab.com/scpcorp/ScPrime/modules"
+	"gitlab.com/scpcorp/ScPrime/modules/consensus"
 )
 
+const skipped = "Skipped"
+const closed = "Closed"
+
 var status = ""
-var skip = false
-var initialize = false
 
 // Skip bootstrapping consensus from consensus.scpri.me
 func Skip() {
-	skip = true
-	status = "Skipped"
+	status = skipped
+}
+
+// Close bootstrapping consensus module
+func Close() {
+	fmt.Println("Closing bootstrapper...")
+	status = closed
 }
 
 // Initialize bootstrapping consensus from consensus.scpri.me
 func Initialize() {
-	initialize = true
-	status = "0%"
+	status = "0"
 }
 
 // Progress returns the bootstrapper's progress as a percentage.
 func Progress() string {
-	return status
+	_, err := strconv.Atoi(status)
+	if err != nil {
+		return status
+	}
+	return status + `%`
 }
 
 // Start begins the process of bootstrapping consensus from consensus.scpri.me.
@@ -76,7 +87,7 @@ func Start(dataDir string) {
 		<-sem
 	}(tmp.Name())
 	// Updates the status.
-	status = `0%`
+	status = `0`
 	for i := 1; true; i++ {
 		updateStatus(tmp.Name(), size)
 		if len(sem) == 0 {
@@ -84,12 +95,12 @@ func Start(dataDir string) {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	if skip {
+	if status == skipped || status == closed {
 		return
 	}
-	status = `99%`
+	status = `99`
 	decompress(tmp.Name(), consensusDb)
-	status = `100%`
+	status = `100`
 }
 
 // Decompress the zip archive; move consensus.db to the destination.
@@ -158,7 +169,8 @@ func consensusDownload(target string) error {
 			}
 			return err
 		}
-		if skip {
+		_, err = strconv.Atoi(status)
+		if err != nil {
 			break
 		}
 	}
@@ -168,9 +180,13 @@ func consensusDownload(target string) error {
 
 // updates the status.
 func updateStatus(filepath string, size int64) {
+	_, err := strconv.Atoi(status)
+	if err != nil {
+		return
+	}
 	fi, _ := os.Stat(filepath)
 	progress := int(float64(fi.Size()) / float64(size) * float64(100))
 	if progress > 0 && progress < 99 {
-		status = fmt.Sprintf("%d%%", progress)
+		status = fmt.Sprintf("%d", progress)
 	}
 }

@@ -62,18 +62,18 @@ func installKillSignalHandler() chan os.Signal {
 	return sigChan
 }
 
-func startNode(nodeParams node.NodeParams, loadStart time.Time) *node.Node {
-	node, err := newNode(nodeParams)
+func startNode(node *node.Node, nodeParams node.NodeParams, loadStart time.Time) {
+	err := loadNode(node, nodeParams)
 	if err != nil {
 		fmt.Println("Server is unable to create the ScPrime node.")
 		fmt.Println(err)
-		return nil
+		return
 	}
 	server.AttachNode(node)
 	// Print a 'startup complete' message.
 	startupTime := time.Since(loadStart)
 	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
-	return node
+	return
 }
 
 // StartDaemon uses the config parameters to initialize modules and start the web wallet.
@@ -98,7 +98,8 @@ func StartDaemon(nodeParams node.NodeParams) (err error) {
 	server.StartHTTPServer()
 
 	// Start a node
-	node := startNode(nodeParams, loadStart)
+	node := &node.Node{}
+	go startNode(node, nodeParams, loadStart)
 
 	select {
 	case <-server.Wait():
@@ -109,7 +110,7 @@ func StartDaemon(nodeParams node.NodeParams) (err error) {
 
 	// Close
 	if node != nil {
-		node.Close()
+		closeNode(node, nodeParams)
 	}
 	return nil
 }
