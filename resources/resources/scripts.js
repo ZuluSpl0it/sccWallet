@@ -46,6 +46,9 @@ function refreshBalance() {
         for (const element of document.getElementsByClassName("spf_funds")){
           element.innerHTML=result[2];
         }
+        for (const element of document.getElementsByClassName("whale_size")){
+          element.innerHTML=result[3];
+        }
         setTimeout(() => {refreshBalance();}, 1000);
       })
       .catch(error => {

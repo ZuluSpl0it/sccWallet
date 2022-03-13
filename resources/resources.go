@@ -76,6 +76,9 @@ var collapsedMenuForm string
 //go:embed resources/forms/expanded_menu.html
 var expandedMenuForm string
 
+//go:embed resources/forms/explain_whale.html
+var explainWhaleForm string
+
 //go:embed resources/fonts/open-sans-v27-latin/open-sans-v27-latin-regular.woff2
 var openSansLatinRegularWoff2 []byte
 
@@ -195,6 +198,11 @@ func ChangeLockForm() string {
 // ExpandedMenuForm returns the HTML form
 func ExpandedMenuForm() string {
 	return expandedMenuForm
+}
+
+// ExplainWhaleForm returns the HTML form
+func ExplainWhaleForm() string {
+	return explainWhaleForm
 }
 
 // CollapsedMenuForm returns the HTML form
