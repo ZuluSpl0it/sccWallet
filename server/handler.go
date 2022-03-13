@@ -43,8 +43,8 @@ func faviconHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Param
 }
 
 func balanceHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal := balancesHelper()
-	writeArray(w, []string{fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal})
+	fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal, fmtWhale := balancesHelper()
+	writeArray(w, []string{fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal, fmtWhale})
 }
 
 func blockHeightHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -560,6 +560,17 @@ func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 	writeWallet(w, sessionID)
 }
 
+func explainWhaleHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	sessionID := req.FormValue("session_id")
+	if sessionID == "" || !sessionIDExists(sessionID) {
+		msg := "Session ID does not exist."
+		writeError(w, msg, "")
+	}
+	title := "WHAT WHALE ARE YOU?"
+	form := resources.ExplainWhaleForm()
+	writeForm(w, title, form, sessionID)
+}
+
 func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {
@@ -793,11 +804,12 @@ func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	html = strings.Replace(html, "&STATUS_COLOR;", fmtStatCo, -1)
 	html = strings.Replace(html, "&STATUS;", fmtStatus, -1)
 	html = strings.Replace(html, "&BLOCK_HEIGHT;", fmtHeight, -1)
-	fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal := balancesHelper()
+	fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal, fmtWhale := balancesHelper()
 	html = strings.Replace(html, "&SCP_BALANCE;", fmtScpBal, -1)
 	html = strings.Replace(html, "&UNCONFIRMED_DELTA;", fmtUncBal, -1)
 	html = strings.Replace(html, "&SPF_BALANCE;", fmtSpfBal, -1)
 	html = strings.Replace(html, "&SCP_CLAIM_BALANCE;", fmtClmBal, -1)
+	html = strings.Replace(html, "&WHALE_SIZE;", fmtWhale, -1)
 	if menuIsCollapsed(sessionID) {
 		html = strings.Replace(html, "&MENU;", resources.CollapsedMenuForm(), -1)
 	} else {
@@ -814,7 +826,44 @@ func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	fmt.Fprint(w, html)
 }
 
-func balancesHelper() (string, string, string, string) {
+func whaleHelper(scpBal float64) string {
+	if scpBal < 50 {
+		return "🦐"
+	}
+	if scpBal < 100 {
+		return "🐟"
+	}
+	if scpBal < 1000 {
+		return "🦀"
+	}
+	if scpBal < 5000 {
+		return "🐢"
+	}
+	if scpBal < 10000 {
+		return "⚔️🐠"
+	}
+	if scpBal < 25000 {
+		return "🐬"
+	}
+	if scpBal < 50000 {
+		return "🦈"
+	}
+	if scpBal < 100000 {
+		return "🌊🦄"
+	}
+	if scpBal < 250000 {
+		return "🌊🐫"
+	}
+	if scpBal < 500000 {
+		return "🐋"
+	}
+	if scpBal < 1000000 {
+		return "🐙"
+	}
+	return "🐳"
+}
+
+func balancesHelper() (string, string, string, string, string) {
 	unlocked, err := n.Wallet.Unlocked()
 	if err != nil {
 		fmt.Printf("Unable to determine if wallet is unlocked: %v", err)
@@ -823,6 +872,7 @@ func balancesHelper() (string, string, string, string) {
 	fmtUncBal := "?"
 	fmtSpfBal := "?"
 	fmtClmBal := "?"
+	fmtWhale := "?"
 	if unlocked {
 		scpBal, spfBal, scpClaimBal, err := n.Wallet.ConfirmedBalance()
 		if err != nil {
@@ -833,6 +883,11 @@ func balancesHelper() (string, string, string, string) {
 			fmtScpBal = fmt.Sprintf("%15.2f", scpBalFloat)
 			fmtSpfBal = fmt.Sprintf("%s", spfBal)
 			fmtClmBal = fmt.Sprintf("%15.2f", scpClaimBalFloat)
+			if scpBalFloat < 49 {
+				fmtWhale = "🦐"
+			} else if scpBalFloat < 99 {
+				fmtWhale = "🐟"
+			}
 		}
 		scpOut, scpIn, err := n.Wallet.UnconfirmedBalance()
 		if err != nil {
@@ -843,7 +898,7 @@ func balancesHelper() (string, string, string, string) {
 			fmtUncBal = fmt.Sprintf("%15.2f", (scpInFloat - scpOutFloat))
 		}
 	}
-	return fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal
+	return fmtScpBal, fmtUncBal, fmtSpfBal, fmtClmBal, fmtWhale
 }
 
 func blockHeightHelper() (string, string, string) {
