@@ -951,7 +951,6 @@ func shutdownHelper() {
 	time.Sleep(5000 * time.Millisecond)
 	if time.Now().After(heartbeat.Add(5000 * time.Millisecond)) {
 		fmt.Println("Heartbeat expired.")
-		bootstrapper.Skip()
 		srv.Shutdown(context.Background())
 	}
 }

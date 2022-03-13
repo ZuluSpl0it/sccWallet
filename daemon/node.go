@@ -16,13 +16,12 @@ import (
 	"gitlab.com/scpcorp/webwallet/server"
 )
 
-func newNode(params node.NodeParams) (*node.Node, error) {
-	node := &node.Node{}
-	fmt.Println("Starting modules:")
+func loadNode(node *node.Node, params node.NodeParams) error {
+	fmt.Println("Loading modules:")
 	// Make sure the path is an absolute one.
 	dir, err := filepath.Abs(params.Dir)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	node.Dir = dir
 	// Bootstrap Consensus Set if necessary
@@ -30,25 +29,36 @@ func newNode(params node.NodeParams) (*node.Node, error) {
 	// Load Gateway.
 	err = loadGateway(params, node)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	// Load Consensus Set
 	err = loadConsensusSet(params, node)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	// Load Transaction Pool
 	err = loadTransactionPool(params, node)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	// Load Wallet
 	err = loadWallet(params, node)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	server.AttachNode(node)
-	return node, nil
+	return nil
+}
+
+func closeNode(node *node.Node, params node.NodeParams) error {
+	fmt.Println("Closing modules:")
+	params.CreateWallet = false
+	params.CreateTransactionPool = false
+	params.CreateConsensusSet = false
+	params.CreateGateway = false
+	err := node.Close()
+	bootstrapper.Close()
+	return err
 }
 
 func bootstrapConsensusSet(params node.NodeParams) {
