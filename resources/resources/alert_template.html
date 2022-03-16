@@ -31,12 +31,8 @@
                 ScPrime Funds:
                 <font class="spf_funds">&SPF_BALANCE;</font> SPF
               </div>
-              <div>
-                <form class="inline-block" action="/gui/explainWhale?&CACHE_BUSTER;" method="post">
-                  <input type="hidden" name="session_id" value="&SESSION_ID;">
-                  <input class="txid-button white" type="submit" value="Whale Size:">
-                </form>
-                <font class="whale_size">&WHALE_SIZE;</font>
+              <div id="whale_size">
+                <script>document.getElementById("whale_size").innerHTML = "Whale Size: &WHALE_SIZE;"</script>
               </div>
             </div>
           </div>

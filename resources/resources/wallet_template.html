@@ -35,9 +35,9 @@
               <div>
                 <form class="inline-block" action="/gui/explainWhale?&CACHE_BUSTER;" method="post">
                   <input type="hidden" name="session_id" value="&SESSION_ID;">
-                  <input class="txid-button white" type="submit" value="Whale Size:">
+                  <input id="whale_size_button" type="hidden" class="txid-button white" value="Whale Size: &WHALE_SIZE;">
                 </form>
-                <font class="whale_size">&WHALE_SIZE;</font>
+                <script>document.getElementById("whale_size_button").type="submit"</script>
               </div>
             </div>
           </div>

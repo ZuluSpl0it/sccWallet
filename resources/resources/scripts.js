@@ -29,25 +29,31 @@ function refreshBlockHeight() {
         setTimeout(() => {refreshBlockHeight();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBlockHeight();}, 1000);
+    setTimeout(() => {refreshBlockHeight();}, 50);
   }
 }
 function refreshBalance() {
-  if (document.getElementsByClassName('balance').length > 0) {
+  var balance = document.getElementById("balance");
+  if (typeof(balance) != 'undefined' && balance != null) {
     fetch("/gui/balance")
       .then(response => response.json())
       .then(result => {
         for (const element of document.getElementsByClassName("confirmed")){
-          element.innerHTML=result[0];
+          element.innerHTML = result[0];
         }
         for (const element of document.getElementsByClassName("unconfirmed")){
-          element.innerHTML=result[1];
+          element.innerHTML = result[1];
         }
         for (const element of document.getElementsByClassName("spf_funds")){
-          element.innerHTML=result[2];
+          element.innerHTML = result[2];
         }
-        for (const element of document.getElementsByClassName("whale_size")){
-          element.innerHTML=result[3];
+        var whaleSize = document.getElementById("whale_size")
+        if (typeof(whaleSize) != 'undefined' && whaleSize != null) {
+          whaleSize.innerHTML = "Whale Size: " + result[4];
+        }
+        var whaleSizeButton = document.getElementById("whale_size_button")
+        if (typeof(whaleSizeButton) != 'undefined' && whaleSizeButton != null) {
+          whaleSizeButton.value = "Whale Size: " + result[4];
         }
         setTimeout(() => {refreshBalance();}, 1000);
       })
@@ -56,7 +62,7 @@ function refreshBalance() {
         setTimeout(() => {refreshBalance();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBalance();}, 1000);
+    setTimeout(() => {refreshBalance();}, 50);
   }
 }
 function refreshBootstrapperProgress() {
@@ -85,7 +91,7 @@ function refreshBootstrapperProgress() {
         setTimeout(() => {refreshBootstrapperProgress();}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBootstrapperProgress();}, 1000);
+    setTimeout(() => {refreshBootstrapperProgress();}, 50);
   }
 }
 function refreshHeartbeat() {
