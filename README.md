@@ -52,7 +52,7 @@ To build the release binaries from source, sha1sum and [Go 1.17 or above](https:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
-cd webwallet && ./release-scripts/release.sh v0.1.1
+cd webwallet && ./release-scripts/release.sh v0.1.2
 cd release
 ```
 
