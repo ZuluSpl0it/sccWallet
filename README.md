@@ -48,13 +48,24 @@ Other Makefile commands are:
 Building Release Binaries
 -------------------------
 
-To build the release binaries from source, sha1sum and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
+To build the release binaries from source; zip, sha1sum, and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
-cd webwallet && ./release-scripts/release.sh v0.1.2
+cd webwallet && ./release-scripts/release.sh v0.0.0
 cd release
 ```
 
 This will save the `scp-webwallet` release binaries to the webwallet's `./release` directory.
 
+Building Signed Release Binaries
+--------------------------------
+
+To build signed release binaries; zip, gpg, sha1sum, and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
+```sh
+git clone https://gitlab.com/scpcorp/webwallet
+cd webwallet && ./release-scripts/release.sh v0.0.0 keyfile
+cd release
+```
+
+This will save the signed `scp-webwallet` release binaries to the webwallet's `./release` directory.
