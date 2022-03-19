@@ -67,7 +67,13 @@ func bootstrapConsensusSet(params node.NodeParams) {
 	time.Sleep(1 * time.Millisecond)
 	bootstrapper.Start(params.Dir)
 	loadTime := time.Since(loadStart).Seconds()
-	fmt.Println(" done in", loadTime, "seconds.")
+	if bootstrapper.Progress() == bootstrapper.Skipped {
+		fmt.Println(" skipped after", loadTime, "seconds.")
+	} else if bootstrapper.Progress() == bootstrapper.Closed {
+		fmt.Println(" closed after", loadTime, "seconds.")
+	} else {
+		fmt.Println(" done in", loadTime, "seconds.")
+	}
 }
 
 func loadGateway(params node.NodeParams, node *node.Node) error {
