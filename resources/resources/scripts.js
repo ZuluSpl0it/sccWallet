@@ -73,12 +73,9 @@ function refreshBootstrapperProgress() {
         var status = result[0]
         // Autorefresh wallet to make onboarding smoother.
         if (status === "100%") {
-          var pathname = location.pathname
-          if (pathname === "/") {
-            var refreshBootstrapper = document.getElementById("refreshBootstrapper")
-            if (typeof(refreshBootstrapper) != 'undefined' && refreshBootstrapper != null) {
-              refreshBootstrapper.submit()
-            }
+          var refreshBootstrapper = document.getElementById("refreshBootstrapper")
+          if (typeof(refreshBootstrapper) != 'undefined' && refreshBootstrapper != null) {
+            refreshBootstrapper.submit()
           }
         }
         for (const element of document.getElementsByClassName("bootstrapper-progress")){
