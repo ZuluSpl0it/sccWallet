@@ -883,11 +883,7 @@ func balancesHelper() (string, string, string, string, string) {
 			fmtScpBal = fmt.Sprintf("%15.2f", scpBalFloat)
 			fmtSpfBal = fmt.Sprintf("%s", spfBal)
 			fmtClmBal = fmt.Sprintf("%15.2f", scpClaimBalFloat)
-			if scpBalFloat < 49 {
-				fmtWhale = "🦐"
-			} else if scpBalFloat < 99 {
-				fmtWhale = "🐟"
-			}
+			fmtWhale = whaleHelper(scpBalFloat)
 		}
 		scpOut, scpIn, err := n.Wallet.UnconfirmedBalance()
 		if err != nil {
