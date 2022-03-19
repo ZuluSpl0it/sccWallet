@@ -616,6 +616,7 @@ func initializeBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ h
 
 func skipBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	bootstrapper.Skip()
+	time.Sleep(50 * time.Millisecond)
 	guiHandler(w, req, nil)
 }
 

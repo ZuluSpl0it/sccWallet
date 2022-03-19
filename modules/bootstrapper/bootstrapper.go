@@ -16,20 +16,23 @@ import (
 	"gitlab.com/scpcorp/ScPrime/modules/consensus"
 )
 
-const skipped = "Skipped"
-const closed = "Closed"
+// Skipped is the value that the bootstrapper's progress is set to after it has been skipped.
+const Skipped = "Skipped"
+
+// Closed is the value that the bootstrapper's progress is set to after it has been closed.
+const Closed = "Closed"
 
 var status = ""
 
 // Skip bootstrapping consensus from consensus.scpri.me
 func Skip() {
-	status = skipped
+	status = Skipped
 }
 
 // Close bootstrapping consensus module
 func Close() {
 	fmt.Println("Closing bootstrapper...")
-	status = closed
+	status = Closed
 }
 
 // Initialize bootstrapping consensus from consensus.scpri.me
@@ -66,7 +69,11 @@ func Start(dataDir string) {
 	}
 	// Consensus does not exist. Block until user chooses to bootstrap it or build it.
 	for status == "" {
-		time.Sleep(1 * time.Second)
+		time.Sleep(25 * time.Millisecond)
+	}
+	// Return early if the bootstrapper was skipped or closed.
+	if status == Skipped || status == Closed {
+		return
 	}
 	size, err := consensusSize()
 	if size == 0 || err != nil {
@@ -95,7 +102,7 @@ func Start(dataDir string) {
 		}
 		time.Sleep(1 * time.Second)
 	}
-	if status == skipped || status == closed {
+	if status == Skipped || status == Closed {
 		return
 	}
 	status = `99`
