@@ -5,11 +5,12 @@
       <button class="input-wide" type="submit">Close Menu</button>
     </form>
   </div>
-  <div>
+  <div id="refresh_page_button">
     <form class="inline-block input-wide" action="/gui?&CACHE_BUSTER;" method="post">
       <input type="hidden" name="session_id" value="&SESSION_ID;">
       <button class="input-wide" type="submit">Refresh</button>
     </form>
+    <script>document.getElementById("refresh_page_button").className="display-none"</script>
   </div>
   <div>
     <form class="inline-block input-wide" action="/gui/alert/changeLock?&CACHE_BUSTER;" method="post">

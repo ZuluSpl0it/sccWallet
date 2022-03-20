@@ -1,4 +1,14 @@
-    <h2 class="center blue-bg">Transactions</h2>
+    <h2 class="center blue-bg">
+      Transactions
+      <div class="inline-block">
+        <div id="is_last_page" class="&IS_LAST_PAGE;"/>
+        <form class="inline-block" action="/gui?&CACHE_BUSTER;" method="post">
+          <input type="hidden" name="session_id" value="&SESSION_ID;">
+          <input id="refresh_transactions" type="hidden" class="txid-button white" value="🔄">
+        </form>
+        <script>document.getElementById("refresh_transactions").type="submit"</script>
+      </div>
+    </h2>
     <div class="grid">
       <ul class="row">
         <h3 class="col-5 center no-wrap">
