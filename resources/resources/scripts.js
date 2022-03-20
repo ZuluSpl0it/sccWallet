@@ -32,6 +32,13 @@ function refreshBlockHeight() {
     setTimeout(() => {refreshBlockHeight();}, 50);
   }
 }
+function isLastPage() {
+  var isLastPageElement = document.getElementById("is_last_page")
+  if (typeof(isLastPageElement) != 'undefined' && isLastPageElement != null) {
+    return isLastPageElement.className === "true";
+  }
+  return false;
+}
 function refreshBalance() {
   var balance = document.getElementById("balance");
   if (typeof(balance) != 'undefined' && balance != null) {
@@ -42,6 +49,12 @@ function refreshBalance() {
           element.innerHTML = result[0];
         }
         for (const element of document.getElementsByClassName("unconfirmed")){
+          if (isLastPage() && element.innerHTML.trim() !== result[1].trim()) {
+            var refreshTransactions = document.getElementById("refresh_transactions")
+            if (typeof(refreshTransactions) != 'undefined' && refreshTransactions != null) {
+              refreshTransactions.submit()
+            }
+          }
           element.innerHTML = result[1];
         }
         for (const element of document.getElementsByClassName("spf_funds")){

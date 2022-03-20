@@ -757,8 +757,10 @@ func writeWallet(w http.ResponseWriter, sessionID string) {
 		}
 		options = fmt.Sprintf("<option %s value='%d'>%d</option>", selected, i+1, i+1) + options
 	}
+	isLastPage := getTxHistoryPage(sessionID) == pages+1
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGE;", options, -1)
 	html = strings.Replace(html, "&TRANSACTION_HISTORY_PAGES;", strconv.Itoa(pages+1), -1)
+	html = strings.Replace(html, "&IS_LAST_PAGE;", strconv.FormatBool(isLastPage), -1)
 	writeHTML(w, html, sessionID)
 }
 

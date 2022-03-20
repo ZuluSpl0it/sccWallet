@@ -81,6 +81,9 @@ a:active {
 .inline-block {
   display: inline-block;
 }
+.display-none {
+  display: none;
+}
 .pad {padding: 20px;}
 .pad-col {padding: .5rem;}
 .grid {display:table;width: 100%;}
