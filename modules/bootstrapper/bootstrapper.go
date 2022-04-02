@@ -14,6 +14,8 @@ import (
 
 	"gitlab.com/scpcorp/ScPrime/modules"
 	"gitlab.com/scpcorp/ScPrime/modules/consensus"
+
+	"gitlab.com/scpcorp/webwallet/build"
 )
 
 // Skipped is the value that the bootstrapper's progress is set to after it has been skipped.
@@ -21,6 +23,9 @@ const Skipped = "Skipped"
 
 // Closed is the value that the bootstrapper's progress is set to after it has been closed.
 const Closed = "Closed"
+
+// LocalConsensusSize is the size in bytes of the consensus file that is stored to disk.
+var LocalConsensusSize = int64(0)
 
 var status = ""
 
@@ -37,7 +42,9 @@ func Close() {
 
 // Initialize bootstrapping consensus from consensus.scpri.me
 func Initialize() {
-	status = "0"
+	if status == "" {
+		status = "0"
+	}
 }
 
 // Progress returns the bootstrapper's progress as a percentage.
@@ -62,10 +69,14 @@ func Start(dataDir string) {
 		// Return early and let the consensus module create the directory.
 		return
 	}
-	_, err = os.Stat(consensusDb)
+	fi, err := os.Stat(consensusDb)
 	if !errors.Is(err, os.ErrNotExist) {
-		// Consensus database already exists so there is no need to bootstrap it.
-		return
+		LocalConsensusSize = fi.Size()
+		if LocalConsensusSize > build.ConsensusSizeByteCheck() {
+			// There is no need to bootstrap consensus because the on-disk consensus size is
+			// larger than the consensus size byte check.
+			return
+		}
 	}
 	// Consensus does not exist. Block until user chooses to bootstrap it or build it.
 	for status == "" {
@@ -75,9 +86,10 @@ func Start(dataDir string) {
 	if status == Skipped || status == Closed {
 		return
 	}
-	size, err := consensusSize()
-	if size == 0 || err != nil {
+	remoteConsensusSize, err := requestRemoteConsensusSize()
+	if err != nil {
 		// Do not download consensus-latest.zip because something is wrong.
+		fmt.Printf("\nBootstrapper failed to obtain the remote consensus size. %v\n", err)
 		return
 	}
 	tmp, err := ioutil.TempFile(os.TempDir(), "scprime-consensus")
@@ -96,7 +108,7 @@ func Start(dataDir string) {
 	// Updates the status.
 	status = `0`
 	for i := 1; true; i++ {
-		updateStatus(tmp.Name(), size)
+		updateStatus(tmp.Name(), remoteConsensusSize)
 		if len(sem) == 0 {
 			break
 		}
@@ -112,6 +124,10 @@ func Start(dataDir string) {
 
 // Decompress the zip archive; move consensus.db to the destination.
 func decompress(src string, dest string) error {
+	_, err := os.Stat(dest)
+	if !errors.Is(err, os.ErrNotExist) {
+		os.Remove(dest)
+	}
 	r, err := zip.OpenReader(src)
 	if err != nil {
 		return err
@@ -146,7 +162,7 @@ func decompress(src string, dest string) error {
 }
 
 // Returns the size of the latest consensus database in bytes.
-func consensusSize() (int64, error) {
+func requestRemoteConsensusSize() (int64, error) {
 	resp, err := http.Head("https://consensus.scpri.me/releases/consensus-latest.zip")
 	if err != nil {
 		return 0, err

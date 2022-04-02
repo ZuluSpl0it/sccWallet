@@ -104,6 +104,32 @@ function refreshBootstrapperProgress() {
     setTimeout(() => {refreshBootstrapperProgress();}, 50);
   }
 }
+function refreshConsensusBuilderProgress() {
+  if (document.getElementsByClassName('consensus-builder-progress').length > 0) {
+    fetch("/gui/consensusBuilderProgress")
+      .then(response => response.json())
+      .then(result => {
+        var status = result[0]
+        // Autorefresh wallet to make onboarding smoother.
+        if (status === "100%") {
+          var refreshConsensusBuilder = document.getElementById("refreshConsensusBuilder")
+          if (typeof(refreshConsensusBuilder) != 'undefined' && refreshConsensusBuilder != null) {
+            refreshConsensusBuilder.submit()
+          }
+        }
+        for (const element of document.getElementsByClassName("consensus-builder-progress")){
+          element.innerHTML = status;
+        }
+        setTimeout(() => {refreshConsensusBuilderProgress();}, 1000);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        setTimeout(() => {refreshConsensusBuilderProgress();}, 1000);
+      })
+  } else {
+    setTimeout(() => {refreshConsensusBuilderProgress();}, 50);
+  }
+}
 function refreshHeartbeat() {
   fetch("/gui/heartbeat")
     .then(response => response.json())
@@ -132,6 +158,7 @@ function shutdownNotice() {
   `
 }
 refreshBootstrapperProgress()
+refreshConsensusBuilderProgress()
 refreshBlockHeight()
 refreshBalance()
 refreshHeartbeat()

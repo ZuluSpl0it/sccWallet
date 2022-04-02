@@ -14,6 +14,7 @@ import (
 
 	"gitlab.com/scpcorp/webwallet/build"
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
+	consensusbuilder "gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/resources"
 
 	"gitlab.com/NebulousLabs/errors"
@@ -54,6 +55,10 @@ func blockHeightHandler(w http.ResponseWriter, req *http.Request, _ httprouter.P
 
 func bootstrapperProgressHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	writeArray(w, []string{bootstrapper.Progress()})
+}
+
+func consensusBuilderProgressHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	writeArray(w, []string{consensusbuilder.Progress()})
 }
 
 func heartbeatHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -609,25 +614,48 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	writeHTML(w, html, sessionID)
 }
 
+func initializingNodeHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	if consensusbuilder.Progress() != "" {
+		buildingConsensusSetHandler(w, req, nil)
+	} else if bootstrapper.Progress() != "" {
+		bootstrappingHandler(w, req, nil)
+	} else {
+		initializeConsensusSetFormHandler(w, req, nil)
+	}
+}
+
+func initializeConsensusSetFormHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	message := "Consensus set was not found"
+	if bootstrapper.LocalConsensusSize > 0 {
+		message = "Consensus set is out of date"
+	}
+	html := strings.Replace(resources.InitializeConsensusSetForm(), "&CONSENSUS_MESSAGE;", message, -1)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, html)
+}
+
 func initializeBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	bootstrapper.Initialize()
 	bootstrappingHandler(w, req, nil)
 }
 
-func skipBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func initializeConsensusBuilderHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	bootstrapper.Skip()
 	time.Sleep(50 * time.Millisecond)
-	guiHandler(w, req, nil)
+	consensusbuilder.Initialize()
+	buildingConsensusSetHandler(w, req, nil)
 }
 
 func bootstrappingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	html := ""
 	progress := bootstrapper.Progress()
-	if progress == "" {
-		html = resources.InitializeConsensusSetForm()
-	} else {
-		html = strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", progress, -1)
-	}
+	html := strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", progress, -1)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, html)
+}
+
+func buildingConsensusSetHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	progress := consensusbuilder.Progress()
+	html := strings.Replace(resources.ConsensusSetBuildingHTML(), "&CONSENSUS_BUILDER_PROGRESS;", progress, -1)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprint(w, html)
 }

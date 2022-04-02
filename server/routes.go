@@ -16,6 +16,7 @@ func buildHTTPRoutes() *httprouter.Router {
 	router.GET("/gui/balance", balanceHandler)
 	router.GET("/gui/blockHeight", blockHeightHandler)
 	router.GET("/gui/bootstrapperProgress", bootstrapperProgressHandler)
+	router.GET("/gui/consensusBuilderProgress", consensusBuilderProgressHandler)
 	router.GET("/gui/heartbeat", heartbeatHandler)
 	router.GET("/gui/logo.png", logoHandler)
 	router.GET("/gui/scripts.js", scriptHandler)
@@ -23,9 +24,9 @@ func buildHTTPRoutes() *httprouter.Router {
 	router.GET("/gui/fonts/open-sans-v27-latin-regular.woff2", openSansLatinRegularWoff2Handler)
 	router.GET("/gui/fonts/open-sans-v27-latin-700.woff2", openSansLatin700Woff2Handler)
 	if n == nil {
-		router.GET("/", bootstrappingHandler)
+		router.GET("/", initializingNodeHandler)
 		router.GET("/initializeBootstrapper", initializeBootstrapperHandler)
-		router.GET("/skipBootstrapper", skipBootstrapperHandler)
+		router.GET("/initializeConsensusBuilder", initializeConsensusBuilderHandler)
 	} else {
 		router.GET("/", guiHandler)
 		router.GET("/gui", guiHandler)
