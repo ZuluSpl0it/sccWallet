@@ -22,6 +22,9 @@ var bootstrappingHTML string
 //go:embed resources/consensus_set_building.html
 var consensusSetBuildingHTML string
 
+//go:embed resources/cold_wallet.html
+var coldWalletHTML string
+
 //go:embed resources/wallet_template.html
 var walletHTMLTemplate string
 
@@ -116,6 +119,11 @@ func BootstrappingHTML() string {
 // ConsensusSetBuildingHTML returns an html page
 func ConsensusSetBuildingHTML() string {
 	return consensusSetBuildingHTML
+}
+
+// ColdWalletHTML returns an html page
+func ColdWalletHTML() string {
+	return coldWalletHTML
 }
 
 // WalletHTMLTemplate returns the wallet html template
