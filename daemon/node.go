@@ -13,6 +13,7 @@ import (
 	"gitlab.com/scpcorp/ScPrime/node"
 
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
+	"gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/server"
 )
 
@@ -36,6 +37,8 @@ func loadNode(node *node.Node, params node.NodeParams) error {
 	if err != nil {
 		return err
 	}
+	// Build Consensus Set if necessary
+	buildConsensusSet(params)
 	// Load Transaction Pool
 	err = loadTransactionPool(params, node)
 	if err != nil {
@@ -54,6 +57,7 @@ func closeNode(node *node.Node, params node.NodeParams) error {
 	fmt.Println("Closing modules:")
 	params.CreateWallet = false
 	params.CreateTransactionPool = false
+	consensusbuilder.Close()
 	params.CreateConsensusSet = false
 	params.CreateGateway = false
 	err := node.Close()
@@ -124,6 +128,19 @@ func loadConsensusSet(params node.NodeParams, node *node.Node) error {
 	}
 	node.ConsensusSet = cs
 	return nil
+}
+
+func buildConsensusSet(params node.NodeParams) {
+	loadStart := time.Now()
+	fmt.Printf("Building consensus set...")
+	time.Sleep(1 * time.Millisecond)
+	consensusbuilder.Start(params.Dir)
+	loadTime := time.Since(loadStart).Seconds()
+	if consensusbuilder.Progress() == consensusbuilder.Closed {
+		fmt.Println(" closed after", loadTime, "seconds.")
+	} else {
+		fmt.Println(" done in", loadTime, "seconds.")
+	}
 }
 
 func loadTransactionPool(params node.NodeParams, node *node.Node) error {

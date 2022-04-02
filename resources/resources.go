@@ -19,6 +19,9 @@ var javascript []byte
 //go:embed resources/bootstrapping.html
 var bootstrappingHTML string
 
+//go:embed resources/consensus_set_building.html
+var consensusSetBuildingHTML string
+
 //go:embed resources/wallet_template.html
 var walletHTMLTemplate string
 
@@ -108,6 +111,11 @@ func Javascript() []byte {
 // BootstrappingHTML returns an html page
 func BootstrappingHTML() string {
 	return bootstrappingHTML
+}
+
+// ConsensusSetBuildingHTML returns an html page
+func ConsensusSetBuildingHTML() string {
+	return consensusSetBuildingHTML
 }
 
 // WalletHTMLTemplate returns the wallet html template

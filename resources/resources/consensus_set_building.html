@@ -14,15 +14,12 @@
       </div>
     </div>
     <div id="popup" class="popup center">
-      <h2 class="uppercase">&CONSENSUS_MESSAGE;</h2>
+      <h2 class="uppercase">BUILDING CONSENSUS SET</h2>
       <div class="middle pad blue-dashed" id="popup_content">
-        &CONSENSUS_MESSAGE;. Would you like to bootstrap the consensus set from https://consensus.scpri.me or build a consensus set from a peer pool of full nodes?
+        Building Consensus Set (<font class="consensus-builder-progress">&CONSENSUS_BUILDER_PROGRESS;</font>)
       </div>
-      <form class="inline-block" action="/initializeBootstrapper?&CACHE_BUSTER;" method="get">
-        <button type="submit">Bootstrap</button>
-      </form>
-      <form class="inline-block" action="/initializeConsensusBuilder?&CACHE_BUSTER;" method="get">
-        <button type="submit">Build</button>
+      <form id="refreshConsensusBuilder" class="inline-block" action="/?&CACHE_BUSTER;" method="get">
+        <button type="submit">Refresh</button>
       </form>
     </div>
     <div id="fade" class="fade"></div>

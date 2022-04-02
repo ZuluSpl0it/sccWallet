@@ -6,6 +6,12 @@ import (
 	"runtime"
 )
 
+// ConsensusSizeByteCheck returns the size in bytes that the on-desk consensus
+// database must be larger than to skip the consensus construction prompt.
+func ConsensusSizeByteCheck() int64 {
+	return int64(3500000000)
+}
+
 // ScPrimeWebWalletDir returns the ScPrime web wallet's data directory either from·
 // the environment variable or the default.
 func ScPrimeWebWalletDir() string {
