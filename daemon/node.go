@@ -18,7 +18,7 @@ import (
 	"gitlab.com/scpcorp/webwallet/server"
 )
 
-func loadNode(node *node.Node, params node.NodeParams) error {
+func loadNode(node *node.Node, params *node.NodeParams) error {
 	fmt.Println("Loading modules:")
 	// Make sure the path is an absolute one.
 	dir, err := filepath.Abs(params.Dir)
@@ -47,16 +47,11 @@ func loadNode(node *node.Node, params node.NodeParams) error {
 	if err != nil {
 		return err
 	}
-	// Load Wallet
-	err = loadWallet(params, node)
-	if err != nil {
-		return err
-	}
-	server.AttachNode(node)
+	server.AttachNode(node, params)
 	return nil
 }
 
-func closeNode(node *node.Node, params node.NodeParams) error {
+func closeNode(node *node.Node, params *node.NodeParams) error {
 	fmt.Println("Closing modules:")
 	params.CreateWallet = false
 	params.CreateTransactionPool = false
@@ -78,7 +73,7 @@ func setWalletDirName() {
 	fmt.Printf(" set to %s after %f seconds.\n", build.WalletDirName, loadTime)
 }
 
-func bootstrapConsensusSet(params node.NodeParams) {
+func bootstrapConsensusSet(params *node.NodeParams) {
 	loadStart := time.Now()
 	fmt.Printf("Bootstrapping consensus...")
 	time.Sleep(1 * time.Millisecond)
@@ -93,7 +88,7 @@ func bootstrapConsensusSet(params node.NodeParams) {
 	}
 }
 
-func loadGateway(params node.NodeParams, node *node.Node) error {
+func loadGateway(params *node.NodeParams, node *node.Node) error {
 	loadStart := time.Now()
 	if !params.CreateGateway {
 		return nil
@@ -118,7 +113,7 @@ func loadGateway(params node.NodeParams, node *node.Node) error {
 	return nil
 }
 
-func loadConsensusSet(params node.NodeParams, node *node.Node) error {
+func loadConsensusSet(params *node.NodeParams, node *node.Node) error {
 	loadStart := time.Now()
 	c := make(chan error, 1)
 	defer close(c)
@@ -143,7 +138,7 @@ func loadConsensusSet(params node.NodeParams, node *node.Node) error {
 	return nil
 }
 
-func buildConsensusSet(params node.NodeParams) {
+func buildConsensusSet(params *node.NodeParams) {
 	loadStart := time.Now()
 	fmt.Printf("Building consensus set...")
 	time.Sleep(1 * time.Millisecond)
@@ -156,7 +151,7 @@ func buildConsensusSet(params node.NodeParams) {
 	}
 }
 
-func loadTransactionPool(params node.NodeParams, node *node.Node) error {
+func loadTransactionPool(params *node.NodeParams, node *node.Node) error {
 	loadStart := time.Now()
 	if !params.CreateTransactionPool {
 		return nil
@@ -180,7 +175,8 @@ func loadTransactionPool(params node.NodeParams, node *node.Node) error {
 	return nil
 }
 
-func loadWallet(params node.NodeParams, node *node.Node) error {
+// LoadWallet loads the wallet module
+func LoadWallet(params *node.NodeParams, node *node.Node) error {
 	loadStart := time.Now()
 	if !params.CreateWallet {
 		return nil
