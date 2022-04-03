@@ -5,14 +5,18 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"sync"
 	"time"
 
+	"gitlab.com/scpcorp/ScPrime/modules"
+	"gitlab.com/scpcorp/ScPrime/modules/wallet"
 	"gitlab.com/scpcorp/ScPrime/node"
 )
 
 var (
 	n         *node.Node
+	nParams   *node.NodeParams
 	srv       *http.Server
 	status    string
 	heartbeat time.Time
@@ -52,10 +56,45 @@ func Wait() chan struct{} {
 	return waitCh
 }
 
-// AttachNode attaches the node modules to the HTTP server.
-func AttachNode(node *node.Node) {
+// AttachNode attaches the node to the HTTP server.
+func AttachNode(node *node.Node, params *node.NodeParams) {
 	n = node
+	nParams = params
 	srv.Handler = buildHTTPRoutes()
+}
+
+// AttachWallet loads the wallet module and attaches it to the node.
+func AttachWallet(walletDirName string) error {
+	loadStart := time.Now()
+	nParams.CreateWallet = true
+	walletDeps := nParams.WalletDeps
+	if walletDeps == nil {
+		walletDeps = modules.ProdDependencies
+	}
+	fmt.Printf("Loading wallet...")
+	cs := n.ConsensusSet
+	tp := n.TransactionPool
+	dir := n.Dir
+	w, err := wallet.NewCustomWallet(cs, tp, filepath.Join(dir, "wallets", walletDirName), walletDeps)
+	if err != nil {
+		return err
+	}
+	if w != nil {
+		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
+	}
+	n.Wallet = w
+	return nil
+}
+
+// CloseWallet closes the wallet and removes it from the node.
+func CloseWallet() error {
+	nParams.CreateWallet = false
+	err := n.Wallet.Close()
+	if err != nil {
+		return err
+	}
+	n.Wallet = nil
+	return nil
 }
 
 // updateHeartbeat updates and returns the heartbeat time.

@@ -29,7 +29,7 @@ func main() {
 	go launch()
 	// Start the ScPrime web wallet daemon.
 	// the startDaemon method will only return when it is shutting down.
-	err := daemon.StartDaemon(params)
+	err := daemon.StartDaemon(&params)
 	if err != nil {
 		die(err)
 	}
