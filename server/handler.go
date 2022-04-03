@@ -255,11 +255,6 @@ func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprou
 }
 
 func alertRestoreFromSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	if !n.ConsensusSet.Synced() {
-		msg := "Wallet must be syncronized with the network before it can be restored from a seed."
-		writeError(w, msg, "")
-		return
-	}
 	title := "RESTORE FROM SEED"
 	form := resources.RestoreFromSeedForm()
 	writeForm(w, title, form, "")
@@ -1026,6 +1021,9 @@ func isPasswordValid(password string) (bool, error) {
 
 func restoreSeedHelper(newPassword string, seed modules.Seed, sessionID string) {
 	setStatus("Restoring")
+	for !n.ConsensusSet.Synced() {
+		time.Sleep(25 * time.Millisecond)
+	}
 	var encryptionKey crypto.CipherKey = crypto.NewWalletKey(crypto.HashObject(newPassword))
 	err := n.Wallet.InitFromSeed(encryptionKey, seed)
 	if err != nil {
