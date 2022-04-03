@@ -28,6 +28,7 @@ func buildHTTPRoutes() *httprouter.Router {
 		router.GET("/initializeBootstrapper", initializeBootstrapperHandler)
 		router.GET("/initializeConsensusBuilder", initializeConsensusBuilderHandler)
 		router.GET("/initializeColdWallet", coldWalletHandler)
+		router.POST("/initializeWalletName", initializeWalletNameHandler)
 	} else {
 		router.GET("/", guiHandler)
 		router.GET("/gui", guiHandler)

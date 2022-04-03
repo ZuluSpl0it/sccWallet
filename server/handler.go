@@ -317,6 +317,21 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	guiHandler(w, req, nil)
 }
 
+func initializeWalletNameFormHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, resources.InitializeWalletNameForm())
+}
+
+func initializeWalletNameHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	walletDirName := req.FormValue("wallet_dir_name")
+	if walletDirName == "" {
+		walletDirName = "wallet"
+	}
+	build.WalletDirName = walletDirName
+	time.Sleep(1000 * time.Millisecond)
+	redirect(w, req, nil)
+}
+
 func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	cancel := req.FormValue("cancel")
 	newPassword := req.FormValue("new_password")
@@ -611,7 +626,9 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 }
 
 func initializingNodeHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	if consensusbuilder.Progress() != "" {
+	if build.WalletDirName == "" {
+		initializeWalletNameFormHandler(w, req, nil)
+	} else if consensusbuilder.Progress() != "" {
 		buildingConsensusSetHandler(w, req, nil)
 	} else if bootstrapper.Progress() != "" {
 		bootstrappingHandler(w, req, nil)
