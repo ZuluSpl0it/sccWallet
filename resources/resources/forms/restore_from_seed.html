@@ -1,7 +1,12 @@
 <form action="/gui/restoreSeed?&CACHE_BUSTER;" method="post">
+  <div class="pad">
+    To restore a wallet you must enter in an existing seed and supply a new wallet password 
+    that will be used to lock this wallet. In the future, you will only need to supply this 
+    password to unlock this wallet.
+  </div>
+  <div class="pad">Seed: <input class="input-wide" type="password" name="seed_str"></div>
   <div class="pad">New Password: <input class="input-wide" type="password" name="new_password"></div>
   <div class="pad">Confirm Password: <input class="input-wide" type="password" name="confirm_password"></div>
-  <div class="pad">Seed: <input class="input-wide" type="password" name="seed_str"></div>
   <div class="pad blue-dashed">
     <div class="inline-block">
       <button type="submit">Restore From Seed</button>
