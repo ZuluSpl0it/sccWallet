@@ -12,7 +12,6 @@ import (
 	"gitlab.com/scpcorp/ScPrime/modules/wallet"
 	"gitlab.com/scpcorp/ScPrime/node"
 
-	"gitlab.com/scpcorp/webwallet/build"
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
 	"gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/server"
@@ -26,8 +25,6 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 		return err
 	}
 	node.Dir = dir
-	// Block until Wallet Is Set
-	setWalletDirName()
 	// Bootstrap Consensus Set if necessary
 	bootstrapConsensusSet(params)
 	// Load Gateway.
@@ -61,16 +58,6 @@ func closeNode(node *node.Node, params *node.NodeParams) error {
 	err := node.Close()
 	bootstrapper.Close()
 	return err
-}
-
-func setWalletDirName() {
-	loadStart := time.Now()
-	fmt.Printf("Waiting for wallet dir name to be supplied...")
-	for build.WalletDirName == "" {
-		time.Sleep(25 * time.Millisecond)
-	}
-	loadTime := time.Since(loadStart).Seconds()
-	fmt.Printf(" set to %s after %f seconds.\n", build.WalletDirName, loadTime)
 }
 
 func bootstrapConsensusSet(params *node.NodeParams) {
@@ -176,7 +163,7 @@ func loadTransactionPool(params *node.NodeParams, node *node.Node) error {
 }
 
 // LoadWallet loads the wallet module
-func LoadWallet(params *node.NodeParams, node *node.Node) error {
+func LoadWallet(params *node.NodeParams, node *node.Node, walletDirName string) error {
 	loadStart := time.Now()
 	if !params.CreateWallet {
 		return nil
@@ -189,7 +176,7 @@ func LoadWallet(params *node.NodeParams, node *node.Node) error {
 	cs := node.ConsensusSet
 	tp := node.TransactionPool
 	dir := node.Dir
-	w, err := wallet.NewCustomWallet(cs, tp, filepath.Join(dir, "wallets", build.WalletDirName), walletDeps)
+	w, err := wallet.NewCustomWallet(cs, tp, filepath.Join(dir, "wallets", walletDirName), walletDeps)
 	if err != nil {
 		return err
 	}
