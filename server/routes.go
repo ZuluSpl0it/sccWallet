@@ -23,12 +23,11 @@ func buildHTTPRoutes() *httprouter.Router {
 	router.GET("/gui/styles.css", styleHandler)
 	router.GET("/gui/fonts/open-sans-v27-latin-regular.woff2", openSansLatinRegularWoff2Handler)
 	router.GET("/gui/fonts/open-sans-v27-latin-700.woff2", openSansLatin700Woff2Handler)
+	router.GET("/initializeColdWallet", coldWalletHandler)
 	if n == nil {
 		router.GET("/", initializingNodeHandler)
 		router.GET("/initializeBootstrapper", initializeBootstrapperHandler)
 		router.GET("/initializeConsensusBuilder", initializeConsensusBuilderHandler)
-		router.GET("/initializeColdWallet", coldWalletHandler)
-		router.POST("/initializeWalletName", initializeWalletNameHandler)
 	} else {
 		router.GET("/", guiHandler)
 		router.GET("/gui", guiHandler)
@@ -51,6 +50,7 @@ func buildHTTPRoutes() *httprouter.Router {
 		router.GET("/gui/sendCoins", redirect)
 		router.GET("/gui/setTxHistoryPage", redirect)
 		router.GET("/gui/unlockWallet", redirect)
+		router.GET("/gui/unlockWalletForm", redirect)
 		router.GET("/gui/explorer", redirect)
 		router.POST("/gui", guiHandler)
 		router.POST("/gui/export", transactionHistoryCsvExport)
@@ -72,6 +72,7 @@ func buildHTTPRoutes() *httprouter.Router {
 		router.POST("/gui/sendCoins", sendCoinsHandler)
 		router.POST("/gui/setTxHistoryPage", setTxHistoyPage)
 		router.POST("/gui/unlockWallet", unlockWalletHandler)
+		router.POST("/gui/unlockWalletForm", unlockWalletFormHandler)
 		router.POST("/gui/explorer", explorerHandler)
 	}
 	return router

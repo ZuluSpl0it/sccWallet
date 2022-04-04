@@ -56,13 +56,10 @@ var closeAlertForm string
 var initializeConsensusSetForm string
 
 //go:embed resources/forms/initialize_seed.html
-var intializeSeedForm string
+var initializeSeedForm string
 
 //go:embed resources/forms/initialize_wallet.html
 var initializeWalletForm string
-
-//go:embed resources/forms/initialize_wallet_name_form.html
-var initializeWalletNameForm string
 
 //go:embed resources/forms/restore_from_seed.html
 var restoreFromSeedForm string
@@ -179,19 +176,14 @@ func InitializeConsensusSetForm() string {
 	return initializeConsensusSetForm
 }
 
-// IntializeSeedForm returns the initialize seed form
-func IntializeSeedForm() string {
-	return intializeSeedForm
+// InitializeSeedForm returns the initialize seed form
+func InitializeSeedForm() string {
+	return initializeSeedForm
 }
 
 // InitializeWalletForm returns the initialize wallet form
 func InitializeWalletForm() string {
 	return initializeWalletForm
-}
-
-// InitializeWalletNameForm returns the initialize wallet name form
-func InitializeWalletNameForm() string {
-	return initializeWalletNameForm
 }
 
 // RestoreFromSeedForm returns the restore from seed form

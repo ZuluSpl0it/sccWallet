@@ -63,8 +63,8 @@ func AttachNode(node *node.Node, params *node.NodeParams) {
 	srv.Handler = buildHTTPRoutes()
 }
 
-// AttachWallet loads the wallet module and attaches it to the node.
-func AttachWallet(walletDirName string) error {
+// attachWallet loads the wallet module and attaches it to the node.
+func attachWallet(walletDirName string) error {
 	loadStart := time.Now()
 	nParams.CreateWallet = true
 	walletDeps := nParams.WalletDeps
@@ -86,9 +86,12 @@ func AttachWallet(walletDirName string) error {
 	return nil
 }
 
-// CloseWallet closes the wallet and removes it from the node.
-func CloseWallet() error {
+// closeAndDetachWallet closes the wallet and detaches it from the node.
+func closeAndDetachWallet() error {
 	nParams.CreateWallet = false
+	if n == nil || n.Wallet == nil {
+		return nil
+	}
 	err := n.Wallet.Close()
 	if err != nil {
 		return err

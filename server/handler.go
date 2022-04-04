@@ -161,9 +161,7 @@ func alertChangeLockHandler(w http.ResponseWriter, req *http.Request, _ httprout
 }
 
 func alertInitializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	title := "CREATE NEW WALLET"
-	form := resources.IntializeSeedForm()
-	writeForm(w, title, form, "")
+	writeStaticHTML(w, resources.InitializeSeedForm())
 }
 
 func alertSendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -255,9 +253,11 @@ func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprou
 }
 
 func alertRestoreFromSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	title := "RESTORE FROM SEED"
-	form := resources.RestoreFromSeedForm()
-	writeForm(w, title, form, "")
+	writeStaticHTML(w, resources.RestoreFromSeedForm())
+}
+
+func unlockWalletFormHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	writeStaticHTML(w, resources.UnlockWalletForm())
 }
 
 func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -317,23 +317,12 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	guiHandler(w, req, nil)
 }
 
-func initializeWalletNameFormHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, resources.InitializeWalletNameForm())
-}
-
-func initializeWalletNameHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	cancel := req.FormValue("cancel")
 	walletDirName := req.FormValue("wallet_dir_name")
 	if walletDirName == "" {
 		walletDirName = "wallet"
 	}
-	build.WalletDirName = walletDirName
-	time.Sleep(1000 * time.Millisecond)
-	redirect(w, req, nil)
-}
-
-func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	cancel := req.FormValue("cancel")
 	newPassword := req.FormValue("new_password")
 	confirmPassword := req.FormValue("confirm_password")
 	var msgPrefix = "Unable to initialize new wallet seed: "
@@ -355,6 +344,9 @@ func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httproute
 		msg := msgPrefix + "New password does not match confirmation password."
 		writeError(w, msg, "")
 		return
+	}
+	if n.Wallet == nil {
+		attachWallet(walletDirName)
 	}
 	encrypted, err := n.Wallet.Encrypted()
 	if err != nil {
@@ -398,11 +390,16 @@ func lockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 		return
 	}
 	n.Wallet.Lock()
+	closeAndDetachWallet()
 	guiHandler(w, req, nil)
 }
 
 func restoreSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	cancel := req.FormValue("cancel")
+	walletDirName := req.FormValue("wallet_dir_name")
+	if walletDirName == "" {
+		walletDirName = "wallet"
+	}
 	newPassword := req.FormValue("new_password")
 	confirmPassword := req.FormValue("confirm_password")
 	seedStr := req.FormValue("seed_str")
@@ -430,6 +427,9 @@ func restoreSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.P
 		msg := msgPrefix + "A seed must be provided."
 		writeError(w, msg, "")
 		return
+	}
+	if n.Wallet == nil {
+		attachWallet(walletDirName)
 	}
 	encrypted, err := n.Wallet.Encrypted()
 	if err != nil {
@@ -520,7 +520,7 @@ func sendCoinsHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 	guiHandler(w, req, nil)
 }
 
-func unlockWalletHelper(password string, sessionID string) {
+func unlockWalletHelper(walletDirName string, password string, sessionID string) {
 	var msgPrefix = "Unable to unlock wallet: "
 	if password == "" {
 		msg := "A password must be provided."
@@ -529,6 +529,12 @@ func unlockWalletHelper(password string, sessionID string) {
 			status = ""
 		}
 		return
+	}
+	if walletDirName == "" {
+		walletDirName = "wallet"
+	}
+	if n.Wallet == nil {
+		attachWallet(walletDirName)
 	}
 	potentialKeys, _ := encryptionKeys(password)
 	for _, key := range potentialKeys {
@@ -562,10 +568,16 @@ func unlockWalletHelper(password string, sessionID string) {
 }
 
 func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	cancel := req.FormValue("cancel")
+	if cancel == "true" {
+		guiHandler(w, req, nil)
+		return
+	}
+	walletDirName := req.FormValue("wallet_dir_name")
 	password := req.FormValue("password")
 	sessionID := addSessionID()
 	status = "Scanning"
-	go unlockWalletHelper(password, sessionID)
+	go unlockWalletHelper(walletDirName, password, sessionID)
 	time.Sleep(300 * time.Millisecond)
 	if status != "" {
 		title := "<font class='status &STATUS_COLOR;'>&STATUS;</font> WALLET"
@@ -590,8 +602,8 @@ func explainWhaleHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, "")
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	var msgPrefix = "Unable to retrieve the transaction: "
@@ -626,9 +638,7 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 }
 
 func initializingNodeHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	if build.WalletDirName == "" {
-		initializeWalletNameFormHandler(w, req, nil)
-	} else if consensusbuilder.Progress() != "" {
+	if consensusbuilder.Progress() != "" {
 		buildingConsensusSetHandler(w, req, nil)
 	} else if bootstrapper.Progress() != "" {
 		bootstrappingHandler(w, req, nil)
@@ -643,8 +653,7 @@ func initializeConsensusSetFormHandler(w http.ResponseWriter, req *http.Request,
 		message = "Consensus set is out of date"
 	}
 	html := strings.Replace(resources.InitializeConsensusSetForm(), "&CONSENSUS_MESSAGE;", message, -1)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, html)
+	writeStaticHTML(w, html)
 }
 
 func initializeBootstrapperHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -662,15 +671,13 @@ func initializeConsensusBuilderHandler(w http.ResponseWriter, req *http.Request,
 func bootstrappingHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	progress := bootstrapper.Progress()
 	html := strings.Replace(resources.BootstrappingHTML(), "&BOOTSTRAPPER_PROGRESS;", progress, -1)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, html)
+	writeStaticHTML(w, html)
 }
 
 func buildingConsensusSetHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	progress := consensusbuilder.Progress()
 	html := strings.Replace(resources.ConsensusSetBuildingHTML(), "&CONSENSUS_BUILDER_PROGRESS;", progress, -1)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, html)
+	writeStaticHTML(w, html)
 }
 
 func coldWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -693,15 +700,14 @@ func coldWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 	html := resources.ColdWalletHTML()
 	html = strings.Replace(html, "&SEED;", seedStr, -1)
 	html = strings.Replace(html, "&UNLOCK_HASH;", unlockHashStr, -1)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, html)
+	writeStaticHTML(w, html)
 }
 
 func expandMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, "")
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	expandMenu(sessionID)
@@ -711,8 +717,8 @@ func expandMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 func collapseMenuHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, "")
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	collapseMenu(sessionID)
@@ -729,8 +735,8 @@ func scanningHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 		return
 	}
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, "")
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	if status != "" {
@@ -745,8 +751,8 @@ func scanningHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.Params) {
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, "")
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	page, _ := strconv.Atoi(req.FormValue("page"))
@@ -755,8 +761,12 @@ func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.P
 }
 
 func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	for n == nil || n.Wallet == nil {
-		time.Sleep(100 * time.Millisecond)
+	for n == nil || n.TransactionPool == nil {
+		time.Sleep(25 * time.Millisecond)
+	}
+	if n.Wallet == nil {
+		writeStaticHTML(w, resources.InitializeWalletForm())
+		return
 	}
 	sessionID := req.FormValue("session_id")
 	height, _, _ := blockHeightHelper()
@@ -766,21 +776,9 @@ func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		writeForm(w, title, form, sessionID)
 		return
 	}
-	encrypted, err := n.Wallet.Encrypted()
-	if err != nil {
-		msg := fmt.Sprintf("Unable to determine if wallet is encrypted: %v", err)
-		writeError(w, msg, sessionID)
-		return
-	}
-	if !encrypted {
-		title := "INITIALIZE WALLET"
-		form := resources.InitializeWalletForm()
-		writeForm(w, title, form, sessionID)
-		return
-	}
 	if sessionID == "" || !sessionIDExists(sessionID) {
-		form := resources.UnlockWalletForm()
-		writeForm(w, "UNLOCK WALLET", form, sessionID)
+		closeAndDetachWallet()
+		redirect(w, req, nil)
 		return
 	}
 	if status != "" {
@@ -799,9 +797,8 @@ func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 		writeWallet(w, sessionID)
 		return
 	}
-	title := "UNLOCK WALLET"
-	form := resources.UnlockWalletForm()
-	writeForm(w, title, form, "")
+	closeAndDetachWallet()
+	redirect(w, req, nil)
 }
 
 func writeWallet(w http.ResponseWriter, sessionID string) {
@@ -860,6 +857,17 @@ func writeForm(w http.ResponseWriter, title string, form string, sessionID strin
 	writeHTML(w, html, sessionID)
 }
 
+func writeStaticHTML(w http.ResponseWriter, html string) {
+	// add random data to links to act as a cache buster.
+	// must be done last in case a cache buster is added in from a template.
+	b := make([]byte, 16) //32 characters long
+	rand.Read(b)
+	cacheBuster := hex.EncodeToString(b)
+	html = strings.Replace(html, "&CACHE_BUSTER;", cacheBuster, -1)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, html)
+}
+
 func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	if hasAlert(sessionID) {
 		writeError(w, popAlert(sessionID), sessionID)
@@ -890,8 +898,7 @@ func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	rand.Read(b)
 	cacheBuster := hex.EncodeToString(b)
 	html = strings.Replace(html, "&CACHE_BUSTER;", cacheBuster, -1)
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, html)
+	writeStaticHTML(w, html)
 }
 
 func whaleHelper(scpBal float64) string {

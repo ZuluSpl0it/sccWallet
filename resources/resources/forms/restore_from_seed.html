@@ -1,18 +1,41 @@
-<form action="/gui/restoreSeed?&CACHE_BUSTER;" method="post">
-  <div class="pad">
-    To restore a wallet you must enter in an existing seed and supply a new wallet password 
-    that will be used to lock this wallet. In the future, you will only need to supply this 
-    password to unlock this wallet.
-  </div>
-  <div class="pad">Seed: <input class="input-wide" type="password" name="seed_str"></div>
-  <div class="pad">New Password: <input class="input-wide" type="password" name="new_password"></div>
-  <div class="pad">Confirm Password: <input class="input-wide" type="password" name="confirm_password"></div>
-  <div class="pad blue-dashed">
-    <div class="inline-block">
-      <button type="submit">Restore From Seed</button>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ScPrime Web Wallet</title>
+    <link rel="stylesheet" href="/gui/styles.css">
+    <script type="text/javascript" src="/gui/scripts.js"></script>
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  </head>
+  <body>
+    <div class="col-5 left top no-wrap">
+      <div>
+        <img class="scprime-logo" alt="ScPrime Web Wallet" src="/gui/logo.png"/>
+      </div>
     </div>
-    <div class="inline-block">
-      <button name="cancel" value="true" type="submit">Cancel</button>
+    <div id="popup" class="popup center">
+      <h2 class="uppercase">Restore From Seed</h2>
+      <form action="/gui/restoreSeed?&CACHE_BUSTER;" method="post">
+        <div class="pad blue-dashed">
+          To restore a wallet from a seed you must supply a new wallet name to tell the wallet 
+          where to persist the wallet data, a new wallet password that will be used to lock this
+          wallet, and a wallet seed to restore the wallet from. In the future, you will need to 
+          supply the supplied wallet name and password to unlock this wallet.
+        </div>
+        <div class="pad">Wallet Name: <input class="input-wide" type="text" name="wallet_dir_name"></div>
+        <div class="pad">New Password: <input class="input-wide" type="password" name="new_password"></div>
+        <div class="pad">Confirm Password: <input class="input-wide" type="password" name="confirm_password"></div>
+        <div class="pad">Seed: <input class="input-wide" type="password" name="seed_str"></div>
+        <div class="pad blue-dashed">
+          <div class="inline-block">
+            <button type="submit">Restore From Seed</button>
+          </div>
+          <div class="inline-block">
+            <button name="cancel" value="true" type="submit">Cancel</button>
+          </div>
+        </div>
+      </form>
     </div>
-  </div>
-</form>
+    <div id="fade" class="fade"></div>
+  </body>
+</html>

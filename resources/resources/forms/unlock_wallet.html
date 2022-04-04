@@ -1,8 +1,34 @@
-<form action="/gui/unlockWallet?&CACHE_BUSTER;" method="post">
-  <div class="pad">Password: <input class="input-wide" type="password" name="password"></div>
-  <div class="pad blue-dashed">
-    <div class="inline-block">
-      <button type="submit">Unlock Wallet</button>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ScPrime Web Wallet</title>
+    <link rel="stylesheet" href="/gui/styles.css">
+    <script type="text/javascript" src="/gui/scripts.js"></script>
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  </head>
+  <body>
+    <div class="col-5 left top no-wrap">
+      <div>
+        <img class="scprime-logo" alt="ScPrime Web Wallet" src="/gui/logo.png"/>
+      </div>
     </div>
-  </div>
-</form>
+    <div id="popup" class="popup center">
+      <h2 class="uppercase">Unlock Wallet</h2>
+      <form action="/gui/unlockWallet?&CACHE_BUSTER;" method="post">
+        <div class="pad blue-dashed">Wallet Name: <input class="input-wide" type="text" name="wallet_dir_name"></div>
+        <div class="pad">Password: <input class="input-wide" type="password" name="password"></div>
+        <div class="pad blue-dashed">
+          <div class="inline-block">
+            <button type="submit">Unlock Wallet</button>
+          </div>
+          <div class="inline-block">
+            <button name="cancel" value="true" type="submit">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div id="fade" class="fade"></div>
+  </body>
+</html>
+

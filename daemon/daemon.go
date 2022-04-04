@@ -70,7 +70,6 @@ func startNode(node *node.Node, params *node.NodeParams, loadStart time.Time) {
 		return
 	}
 	server.AttachNode(node, params)
-	server.AttachWallet(build.WalletDirName)
 	// Print a 'startup complete' message.
 	startupTime := time.Since(loadStart)
 	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
