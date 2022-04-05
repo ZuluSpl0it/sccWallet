@@ -99,7 +99,25 @@ func StartDaemon(nodeParams *node.NodeParams) (err error) {
 
 	// Start a node
 	node := &node.Node{}
-	go startNode(node, nodeParams, loadStart)
+	if server.IsRunning() {
+		go startNode(node, nodeParams, loadStart)
+	}
+
+	if server.IsRunning() {
+		// Block until node is started or 500 milliseconds has passed.
+		for i := 0; i < 100; i++ {
+			if node.TransactionPool == nil {
+				time.Sleep(5 * time.Millisecond)
+			}
+		}
+	}
+
+	// Launch the GUI
+	launch()
+
+	if !server.IsRunning() {
+		return nil
+	}
 
 	select {
 	case <-server.Wait():
@@ -109,6 +127,7 @@ func StartDaemon(nodeParams *node.NodeParams) (err error) {
 	}
 
 	// Close
+	server.CloseAllWallets()
 	if node != nil {
 		closeNode(node, nodeParams)
 	}

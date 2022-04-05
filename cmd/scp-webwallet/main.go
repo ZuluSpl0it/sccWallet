@@ -25,8 +25,6 @@ func die(args ...interface{}) {
 func main() {
 	// configure the the node params.
 	params := configNodeParams()
-	// Launch the GUI
-	go launch()
 	// Start the ScPrime web wallet daemon.
 	// the startDaemon method will only return when it is shutting down.
 	err := daemon.StartDaemon(&params)
