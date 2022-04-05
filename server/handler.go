@@ -934,6 +934,10 @@ func writeHTML(w http.ResponseWriter, html string, sessionID string) {
 	cachedPage(html, sessionID)
 	html = strings.Replace(html, "&WEB_WALLET_VERSION;", build.Version, -1)
 	html = strings.Replace(html, "&SPD_VERSION;", spdBuild.Version, -1)
+	session, _ := getSession(sessionID)
+	if session != nil {
+		html = strings.Replace(html, "&SESSION_NAME;", session.name, -1)
+	}
 	fmtHeight, fmtStatus, fmtStatCo := blockHeightHelper(sessionID)
 	html = strings.Replace(html, "&STATUS_COLOR;", fmtStatCo, -1)
 	html = strings.Replace(html, "&STATUS;", fmtStatus, -1)
