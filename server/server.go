@@ -86,63 +86,84 @@ func AttachNode(node *node.Node, params *node.NodeParams) {
 	}
 }
 
-// newWallet creates a new wallet module and attaches it to the node.
+// newWallet attaches a newly created wallet module to the session.
 func newWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
-	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
-	_, err := os.Stat(walletDir)
-	if err == nil {
-		return nil, fmt.Errorf("%s already exists", walletDirName)
-	}
 	loadStart := time.Now()
 	walletDeps := nParams.WalletDeps
 	if walletDeps == nil {
 		walletDeps = modules.ProdDependencies
 	}
 	fmt.Printf("Loading wallet...")
+	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
+	_, err := os.Stat(walletDir)
+	if err == nil {
+		return nil, fmt.Errorf("%s already exists", walletDirName)
+	}
 	cs := n.ConsensusSet
 	tp := n.TransactionPool
+	session, err := getSession(sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if session.wallet != nil {
+		errors.New("session already has a wallet loaded")
+	}
 	w, err := wallet.NewCustomWallet(cs, tp, walletDir, walletDeps)
 	if err != nil {
 		return nil, err
 	}
-	if w != nil {
-		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
-	}
-	for _, session := range sessions {
-		if session.id == sessionID {
-			if session.wallet != nil {
-				session.wallet.Close()
-			}
-			session.wallet = w
-			return w, nil
-		}
-	}
-	return nil, errors.New("session ID was not found")
+	session.wallet = w
+	fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
+	return w, nil
 }
 
-// loadWallet loads the wallet module and attaches it to the node.
-func loadWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
+// existingWallet attaches an existing wallet module to the session.
+func existingWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
+	loadStart := time.Now()
+	walletDeps := nParams.WalletDeps
+	if walletDeps == nil {
+		walletDeps = modules.ProdDependencies
+	}
+	fmt.Printf("Loading wallet...")
 	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
 	_, err := os.Stat(walletDir)
 	if checkErrors.Is(err, os.ErrNotExist) {
 		return nil, fmt.Errorf("%s does not exist", walletDirName)
 	}
-	return newWallet(walletDirName, sessionID)
+	cs := n.ConsensusSet
+	tp := n.TransactionPool
+	session, err := getSession(sessionID)
+	if err != nil {
+		return nil, err
+	}
+	if session.wallet != nil {
+		errors.New("session already has a wallet loaded")
+	}
+	w, err := wallet.NewCustomWallet(cs, tp, walletDir, walletDeps)
+	if err != nil {
+		return nil, err
+	}
+	session.wallet = w
+	fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
+	return w, nil
 }
 
 // closeWallet closes the wallet and detaches it from the node.
-func closeWallet(sessionID string) (err error) {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			wallet := session.wallet
-			if wallet != nil {
-				session.wallet = nil
-				fmt.Println("Closing wallet...")
-				err = errors.Compose(wallet.Close())
-			}
+func closeWallet(sessionID string) error {
+	session, err := getSession(sessionID)
+	if err != nil {
+		return err
+	}
+	wallet := session.wallet
+	if wallet != nil {
+		session.wallet = nil
+		fmt.Println("Closing wallet...")
+		err = wallet.Close()
+		if err != nil {
+			return err
 		}
 	}
-	return err
+	return nil
 }
 
 // CloseAllWallets closes all wallets and detaches them from the node.
@@ -159,23 +180,21 @@ func CloseAllWallets() (err error) {
 }
 
 func getWallet(sessionID string) (modules.Wallet, error) {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			if session.wallet != nil {
-				return session.wallet, nil
-			}
-		}
+	session, err := getSession(sessionID)
+	if err != nil {
+		return nil, err
+	} else if session.wallet == nil {
+		return nil, errors.New("no wallet is attached to the session")
 	}
-	return nil, errors.New("no wallet is attached to the session")
+	return session.wallet, nil
 }
 
 // updateHeartbeat updates and returns the heartbeat time.
 func updateHeartbeat(sessionID string) time.Time {
 	heartbeat = time.Now()
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.heartbeat = heartbeat
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.heartbeat = time.Now()
 	}
 	return heartbeat
 }
@@ -198,73 +217,73 @@ func addSessionID() string {
 	return session.id
 }
 
-// sessionIDExists returns true when the supplied session ID exists in memory.
-func sessionIDExists(sessionID string) bool {
+// getSession returns the session.
+func getSession(sessionID string) (*Session, error) {
 	for _, session := range sessions {
 		if session.id == sessionID {
-			return true
+			return session, nil
 		}
 	}
-	return false
+	return nil, errors.New("session ID was not found")
+}
+
+// sessionIDExists returns true when the supplied session ID exists in memory.
+func sessionIDExists(sessionID string) bool {
+	session, _ := getSession(sessionID)
+	return session != nil
 }
 
 // setAlert sets an alert on the session.
 func setAlert(alert string, sessionID string) {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.alert = alert
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.alert = alert
 	}
 }
 
 // hasAlert returns true when the session has an alert.
 func hasAlert(sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			return session.alert != ""
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		return session.alert != ""
 	}
 	return false
 }
 
 // popAlert gets the alert from the session and then clears it from the session.
 func popAlert(sessionID string) string {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			alert := session.alert
-			session.alert = ""
-			return alert
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		alert := session.alert
+		session.alert = ""
+		return alert
 	}
 	return ""
 }
 
 // collapseMenu sets the menu state to collapsed and returns true
 func collapseMenu(sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.collapseMenu = true
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.collapseMenu = true
 	}
 	return true
 }
 
 // expandMenu sets the menu state to expanded and returns true
 func expandMenu(sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.collapseMenu = false
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.collapseMenu = false
 	}
 	return true
 }
 
 // menuIsCollapsed returns true when the menu state is collapsed
 func menuIsCollapsed(sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			return session.collapseMenu
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		return session.collapseMenu
 	}
 	// default to the menu being expanded just in case
 	return false
@@ -272,40 +291,36 @@ func menuIsCollapsed(sessionID string) bool {
 
 // setTxHistoryPage sets the session's transaction history page and returns true.
 func setTxHistoryPage(txHistoryPage int, sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.txHistoryPage = txHistoryPage
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.txHistoryPage = txHistoryPage
 	}
 	return true
 }
 
 // getTxHistoryPage returns the session's transaction history page or -1 when no session is found.
 func getTxHistoryPage(sessionID string) int {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			return session.txHistoryPage
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		return session.txHistoryPage
 	}
 	return -1
 }
 
 // cachedPage caches the page without the menu and returns true.
 func cachedPage(cachedPage string, sessionID string) bool {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			session.cachedPage = cachedPage
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		session.cachedPage = cachedPage
 	}
 	return true
 }
 
 // getCachedPage returns the session's cached page.
 func getCachedPage(sessionID string) string {
-	for _, session := range sessions {
-		if session.id == sessionID {
-			return session.cachedPage
-		}
+	session, _ := getSession(sessionID)
+	if session != nil {
+		return session.cachedPage
 	}
 	return ""
 }
