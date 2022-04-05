@@ -1,9 +1,8 @@
-package main
+package daemon
 
 import (
 	"os/exec"
 	"runtime"
-	"time"
 
 	"github.com/pkg/browser"
 )
@@ -12,7 +11,6 @@ import (
 // desirable because they can be launched in app mode (which means that there is no address bar).
 // This allows the GUI head feel most like a native application.
 func launch() bool {
-	time.Sleep(500 * time.Millisecond)
 	switch runtime.GOOS {
 	case "android":
 		return android()

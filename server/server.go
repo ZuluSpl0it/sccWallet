@@ -3,11 +3,15 @@ package server
 import (
 	"crypto/rand"
 	"encoding/hex"
+	checkErrors "errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 	"time"
+
+	"gitlab.com/NebulousLabs/errors"
 
 	"gitlab.com/scpcorp/ScPrime/modules"
 	"gitlab.com/scpcorp/ScPrime/modules/wallet"
@@ -31,6 +35,8 @@ type Session struct {
 	collapseMenu  bool
 	txHistoryPage int
 	cachedPage    string
+	wallet        modules.Wallet
+	heartbeat     time.Time
 }
 
 // StartHTTPServer starts the HTTP server to serve the GUI.
@@ -41,7 +47,8 @@ func StartHTTPServer() {
 	go func() {
 		defer wg.Done()
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			fmt.Printf("ListenAndServe(): %v", err)
+			fmt.Printf("Unable to start server: %v\n", err)
+			srv = nil
 		}
 	}()
 	waitCh = make(chan struct{})
@@ -49,6 +56,20 @@ func StartHTTPServer() {
 		wg.Wait()
 		close(waitCh)
 	}()
+}
+
+// IsRunning returns true when the server is running
+func IsRunning() bool {
+	if srv == nil {
+		return false
+	}
+	for i := 0; i < 20; i++ {
+		time.Sleep(5 * time.Millisecond)
+		if srv == nil {
+			return false
+		}
+	}
+	return srv != nil
 }
 
 // Wait returns the servers wait channel
@@ -60,13 +81,14 @@ func Wait() chan struct{} {
 func AttachNode(node *node.Node, params *node.NodeParams) {
 	n = node
 	nParams = params
-	srv.Handler = buildHTTPRoutes()
+	if srv != nil {
+		srv.Handler = buildHTTPRoutes()
+	}
 }
 
-// attachWallet loads the wallet module and attaches it to the node.
-func attachWallet(walletDirName string) error {
+// newWallet creates a new wallet module and attaches it to the node.
+func newWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
 	loadStart := time.Now()
-	nParams.CreateWallet = true
 	walletDeps := nParams.WalletDeps
 	if walletDeps == nil {
 		walletDeps = modules.ProdDependencies
@@ -74,35 +96,83 @@ func attachWallet(walletDirName string) error {
 	fmt.Printf("Loading wallet...")
 	cs := n.ConsensusSet
 	tp := n.TransactionPool
-	dir := n.Dir
-	w, err := wallet.NewCustomWallet(cs, tp, filepath.Join(dir, "wallets", walletDirName), walletDeps)
+	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
+	w, err := wallet.NewCustomWallet(cs, tp, walletDir, walletDeps)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if w != nil {
 		fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	}
-	n.Wallet = w
-	return nil
+	for _, session := range sessions {
+		if session.id == sessionID {
+			if session.wallet != nil {
+				session.wallet.Close()
+			}
+			session.wallet = w
+			return w, nil
+		}
+	}
+	return nil, errors.New("session ID was not found")
 }
 
-// closeAndDetachWallet closes the wallet and detaches it from the node.
-func closeAndDetachWallet() error {
-	nParams.CreateWallet = false
-	if n == nil || n.Wallet == nil {
-		return nil
+// loadWallet loads the wallet module and attaches it to the node.
+func loadWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
+	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
+	_, err := os.Stat(walletDir)
+	if checkErrors.Is(err, os.ErrNotExist) {
+		return nil, fmt.Errorf("%s does not exist", walletDirName)
 	}
-	err := n.Wallet.Close()
-	if err != nil {
-		return err
+	return newWallet(walletDirName, sessionID)
+}
+
+// closeWallet closes the wallet and detaches it from the node.
+func closeWallet(sessionID string) (err error) {
+	for _, session := range sessions {
+		if session.id == sessionID {
+			wallet := session.wallet
+			if wallet != nil {
+				session.wallet = nil
+				fmt.Println("Closing wallet...")
+				err = errors.Compose(wallet.Close())
+			}
+		}
 	}
-	n.Wallet = nil
-	return nil
+	return err
+}
+
+// CloseAllWallets closes all wallets and detaches them from the node.
+func CloseAllWallets() (err error) {
+	for _, session := range sessions {
+		wallet := session.wallet
+		if wallet != nil {
+			session.wallet = nil
+			fmt.Println("Closing wallet...")
+			err = errors.Compose(wallet.Close())
+		}
+	}
+	return err
+}
+
+func getWallet(sessionID string) (modules.Wallet, error) {
+	for _, session := range sessions {
+		if session.id == sessionID {
+			if session.wallet != nil {
+				return session.wallet, nil
+			}
+		}
+	}
+	return nil, errors.New("no wallet is attached to the session")
 }
 
 // updateHeartbeat updates and returns the heartbeat time.
-func updateHeartbeat() time.Time {
+func updateHeartbeat(sessionID string) time.Time {
 	heartbeat = time.Now()
+	for _, session := range sessions {
+		if session.id == sessionID {
+			session.heartbeat = heartbeat
+		}
+	}
 	return heartbeat
 }
 

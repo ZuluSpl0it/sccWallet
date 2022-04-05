@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ScPrime Web Wallet</title>
+    <link rel="stylesheet" href="/gui/styles.css">
+    <script type="text/javascript" src="/gui/scripts.js"></script>
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  </head>
+  <body>
+    <div class="col-5 left top no-wrap">
+      <div>
+        <img class="scprime-logo" alt="ScPrime Web Wallet" src="/gui/logo.png"/>
+      </div>
+    </div>
+    <div id="popup" class="popup center">
+      <h2 class="uppercase">&POPUP_TITLE;</h2>
+      <div class="middle pad blue-dashed" id="popup_content">&POPUP_CONTENT;</div>
+      &POPUP_CLOSE;
+    </div>
+    <div id="fade" class="fade"></div>
+    <script>
+      refreshBlockHeight("&SESSION_ID;")
+      refreshBalance("&SESSION_ID;")
+      refreshHeartbeat("&SESSION_ID;")
+    </script>
+  </body>
+</html>
+

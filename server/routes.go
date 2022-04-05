@@ -13,20 +13,19 @@ func buildHTTPRoutes() *httprouter.Router {
 
 	//GUI Calls
 	router.GET("/favicon.ico", faviconHandler)
-	router.GET("/gui/balance", balanceHandler)
-	router.GET("/gui/blockHeight", blockHeightHandler)
 	router.GET("/gui/bootstrapperProgress", bootstrapperProgressHandler)
 	router.GET("/gui/consensusBuilderProgress", consensusBuilderProgressHandler)
-	router.GET("/gui/heartbeat", heartbeatHandler)
 	router.GET("/gui/logo.png", logoHandler)
 	router.GET("/gui/scripts.js", scriptHandler)
 	router.GET("/gui/styles.css", styleHandler)
 	router.GET("/gui/fonts/open-sans-v27-latin-regular.woff2", openSansLatinRegularWoff2Handler)
 	router.GET("/gui/fonts/open-sans-v27-latin-700.woff2", openSansLatin700Woff2Handler)
 	router.GET("/initializeColdWallet", coldWalletHandler)
+	router.POST("/gui/heartbeat", heartbeatHandler)
 	if n == nil {
 		router.GET("/", initializingNodeHandler)
 		router.GET("/initializeBootstrapper", initializeBootstrapperHandler)
+		router.GET("/skipBootstrapper", skipBootstrapperHandler)
 		router.GET("/initializeConsensusBuilder", initializeConsensusBuilderHandler)
 	} else {
 		router.GET("/", guiHandler)
@@ -74,6 +73,8 @@ func buildHTTPRoutes() *httprouter.Router {
 		router.POST("/gui/unlockWallet", unlockWalletHandler)
 		router.POST("/gui/unlockWalletForm", unlockWalletFormHandler)
 		router.POST("/gui/explorer", explorerHandler)
+		router.POST("/gui/balance", balanceHandler)
+		router.POST("/gui/blockHeight", blockHeightHandler)
 	}
 	return router
 }

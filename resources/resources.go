@@ -31,6 +31,9 @@ var walletHTMLTemplate string
 //go:embed resources/alert_template.html
 var alertHTMLTemplate string
 
+//go:embed resources/error_template.html
+var errorHTMLTemplate string
+
 //go:embed resources/privacy_template.html
 var privacyHTMLTemplate string
 
@@ -134,6 +137,11 @@ func WalletHTMLTemplate() string {
 // AlertHTMLTemplate returns the alert html template
 func AlertHTMLTemplate() string {
 	return alertHTMLTemplate
+}
+
+// ErrorHTMLTemplate returns the error html template
+func ErrorHTMLTemplate() string {
+	return errorHTMLTemplate
 }
 
 // PrivacyHTMLTemplate returns the privacy html template

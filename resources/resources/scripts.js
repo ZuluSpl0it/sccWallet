@@ -1,6 +1,8 @@
-function refreshBlockHeight() {
+function refreshBlockHeight(sessionID) {
   if (document.getElementsByClassName('block_height').length > 0) {
-    fetch("/gui/blockHeight")
+    var data = new FormData();
+    data.append("session_id", sessionID)
+    fetch("/gui/blockHeight", {method: "POST", body: data})
       .then(response => response.json())
       .then(result => {
         var blockHeight = result[0]
@@ -22,14 +24,14 @@ function refreshBlockHeight() {
         for (const element of document.getElementsByClassName("status")){
           element.className="status " + color
         }
-        setTimeout(() => {refreshBlockHeight();}, 1000);
+        setTimeout(() => {refreshBlockHeight(sessionID);}, 1000);
       })
       .catch(error => {
         console.error("Error:", error);
-        setTimeout(() => {refreshBlockHeight();}, 1000);
+        setTimeout(() => {refreshBlockHeight(sessionID);}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBlockHeight();}, 50);
+    setTimeout(() => {refreshBlockHeight(sessionID);}, 50);
   }
 }
 function isLastPage() {
@@ -39,10 +41,12 @@ function isLastPage() {
   }
   return false;
 }
-function refreshBalance() {
+function refreshBalance(sessionID) {
   var balance = document.getElementById("balance");
   if (typeof(balance) != 'undefined' && balance != null) {
-    fetch("/gui/balance")
+    var data = new FormData();
+    data.append("session_id", sessionID)
+    fetch("/gui/balance", {method: "POST", body: data})
       .then(response => response.json())
       .then(result => {
         for (const element of document.getElementsByClassName("confirmed")){
@@ -68,14 +72,14 @@ function refreshBalance() {
         if (typeof(whaleSizeButton) != 'undefined' && whaleSizeButton != null) {
           whaleSizeButton.value = "Whale Size: " + result[4];
         }
-        setTimeout(() => {refreshBalance();}, 1000);
+        setTimeout(() => {refreshBalance(sessionID);}, 1000);
       })
       .catch(error => {
         console.error("Error:", error);
-        setTimeout(() => {refreshBalance();}, 1000);
+        setTimeout(() => {refreshBalance(sessionID);}, 1000);
       })
   } else {
-    setTimeout(() => {refreshBalance();}, 50);
+    setTimeout(() => {refreshBalance(sessionID);}, 50);
   }
 }
 function refreshBootstrapperProgress() {
@@ -130,12 +134,14 @@ function refreshConsensusBuilderProgress() {
     setTimeout(() => {refreshConsensusBuilderProgress();}, 50);
   }
 }
-function refreshHeartbeat() {
-  fetch("/gui/heartbeat")
+function refreshHeartbeat(sessionID) {
+  var data = new FormData();
+  data.append("session_id", sessionID)
+  fetch("/gui/heartbeat", {method: "POST", body: data})
     .then(response => response.json())
     .then(result => {
     	if (result[0] === "true") {
-        setTimeout(() => {refreshHeartbeat();}, 200);
+        setTimeout(() => {refreshHeartbeat(sessionID);}, 200);
     	}
     })
     .catch(error => {
@@ -159,6 +165,5 @@ function shutdownNotice() {
 }
 refreshBootstrapperProgress()
 refreshConsensusBuilderProgress()
-refreshBlockHeight()
-refreshBalance()
-refreshHeartbeat()
+refreshHeartbeat("")
+
