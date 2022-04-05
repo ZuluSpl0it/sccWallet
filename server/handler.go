@@ -613,7 +613,7 @@ func unlockWalletHandler(w http.ResponseWriter, req *http.Request, _ httprouter.
 		walletDirName = "wallet"
 	}
 	sessionID := addSessionID()
-	wallet, err := loadWallet(walletDirName, sessionID)
+	wallet, err := existingWallet(walletDirName, sessionID)
 	if err != nil {
 		msg := fmt.Sprintf("Unable to unlock wallet: %v", err)
 		writeError(w, msg, sessionID)
@@ -1162,14 +1162,14 @@ func shutdownHelper(sessionID string) {
 		fmt.Println("Heartbeat expired.")
 		CloseAllWallets()
 		srv.Shutdown(context.Background())
-	} else {
-		for _, session := range sessions {
-			if session.id == sessionID {
-				if time.Now().After(session.heartbeat.Add(sleepDuration)) {
-					closeWallet(sessionID)
-				}
-			}
-		}
+		return
+	}
+	session, err := getSession(sessionID)
+	if err != nil {
+		return //no session was found
+	}
+	if time.Now().After(session.heartbeat.Add(sleepDuration)) {
+		closeWallet(sessionID)
 	}
 }
 
