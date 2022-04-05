@@ -88,6 +88,11 @@ func AttachNode(node *node.Node, params *node.NodeParams) {
 
 // newWallet creates a new wallet module and attaches it to the node.
 func newWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
+	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
+	_, err := os.Stat(walletDir)
+	if err == nil {
+		return nil, fmt.Errorf("%s already exists", walletDirName)
+	}
 	loadStart := time.Now()
 	walletDeps := nParams.WalletDeps
 	if walletDeps == nil {
@@ -96,7 +101,6 @@ func newWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
 	fmt.Printf("Loading wallet...")
 	cs := n.ConsensusSet
 	tp := n.TransactionPool
-	walletDir := filepath.Join(n.Dir, "wallets", walletDirName)
 	w, err := wallet.NewCustomWallet(cs, tp, walletDir, walletDeps)
 	if err != nil {
 		return nil, err
