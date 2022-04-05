@@ -36,6 +36,7 @@ type Session struct {
 	txHistoryPage int
 	cachedPage    string
 	wallet        modules.Wallet
+	name          string
 	heartbeat     time.Time
 }
 
@@ -113,6 +114,7 @@ func newWallet(walletDirName string, sessionID string) (modules.Wallet, error) {
 		return nil, err
 	}
 	session.wallet = w
+	session.name = walletDirName
 	fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	return w, nil
 }
@@ -144,6 +146,7 @@ func existingWallet(walletDirName string, sessionID string) (modules.Wallet, err
 		return nil, err
 	}
 	session.wallet = w
+	session.name = walletDirName
 	fmt.Println(" done in", time.Since(loadStart).Seconds(), "seconds.")
 	return w, nil
 }
@@ -157,6 +160,7 @@ func closeWallet(sessionID string) error {
 	wallet := session.wallet
 	if wallet != nil {
 		session.wallet = nil
+		session.name = ""
 		fmt.Println("Closing wallet...")
 		err = wallet.Close()
 		if err != nil {
@@ -172,6 +176,7 @@ func CloseAllWallets() (err error) {
 		wallet := session.wallet
 		if wallet != nil {
 			session.wallet = nil
+			session.name = ""
 			fmt.Println("Closing wallet...")
 			err = errors.Compose(wallet.Close())
 		}
