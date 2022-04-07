@@ -1,17 +1,17 @@
-# [![ScPrime WebWallet](https://scpri.me/imagestore/SPRho_256x256.png)](http://scpri.me)
+# [![ScPrime WebWallet][ScPrime Logo]][ScPrime]
 
-[![Latest Release](https://gitlab.com/scpcorp/webwallet/-/badges/release.svg)](https://gitlab.com/scpcorp/webwallet/-/tags)
-[![Build Status](https://gitlab.com/scpcorp/webwallet/badges/main/pipeline.svg)](https://gitlab.com/scpcorp/webwallet/commits/main)
-[![GoDoc](https://godoc.org/gitlab.com/scpcorp/webwallet?status.svg)](https://godoc.org/gitlab.com/scpcorp/webwallet)
-[![Go Report Card](https://goreportcard.com/badge/gitlab.com/scpcorp/webwallet)](https://goreportcard.com/report/gitlab.com/scpcorp/webwallet)
-[![License MIT](https://img.shields.io/badge/License-MIT-brightgreen.svg)](https://gitlab.com/scpcorp/webwallet/-/blob/main/LICENSE)
+[![Latest Release][Latest Release Badge]][Latest Releases]
+[![Build Status][Build Status Badge]][Commit History]
+[![GoDoc][GoDoc Badge]][GoDoc SCP Corp Web Wallet]
+[![Go Report Card][Go Report Card Badge]][Go Report Card SCP Corp Web Wallet]
+[![License MIT][License Badge]][License Details]
 
 ScPrime has released a browser based GUI (Graphical User Interface) wallet called the WebWallet, that is purely for storing your SCP and doesn't have the 'hosting' aspect that the CLI or UI software has. If you're just looking for software to just send, receive, and hold your SCP, this is a good option for you.
 
 Usage
 -----
 
-Online documentation available at https://docs.scpri.me/software/webwallet
+An online walk through of the web wallet is available in the [ScPrime Documents repository][].
 
 Environment Variables
 ---------------------
@@ -24,7 +24,7 @@ You can configure the web wallet to persist and retrieve application data to a s
 Building From Source
 --------------------
 
-To build from source, [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run make. Example:
+To build from source, [Go 1.17 or above][] must be installed on the system. Then clone the repo and run make. Example:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
@@ -48,7 +48,7 @@ Other Makefile commands are:
 Building Release Binaries
 -------------------------
 
-To build the release binaries from source; zip, sha1sum, and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
+To build the release binaries from source; zip, sha1sum, and [Go 1.17 or above][] must be installed on the system. Then clone the repo and run the release script. Example:
 
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
@@ -61,7 +61,7 @@ This will save the `scp-webwallet` release binaries to the webwallet's `./releas
 Building Signed Release Binaries
 --------------------------------
 
-To build signed release binaries; zip, gpg, sha1sum, and [Go 1.17 or above](https://golang.org/doc/install) must be installed on the system. Then clone the repo and run the release script. Example:
+To build signed release binaries; zip, gpg, sha1sum, and [Go 1.17 or above][] must be installed on the system. Then clone the repo and run the release script. Example:
 ```sh
 git clone https://gitlab.com/scpcorp/webwallet
 cd webwallet && ./release-scripts/release.sh v0.0.0 keyfile
@@ -69,3 +69,19 @@ cd release
 ```
 
 This will save the signed `scp-webwallet` release binaries to the webwallet's `./release` directory.
+
+[ScPrime]: https://scpri.me
+[ScPrime Logo]: https://scpri.me/imagestore/SPRho_256x256.png
+[Latest Release Badge]: https://gitlab.com/scpcorp/webwallet/-/badges/release.svg
+[Latest Releases]: https://gitlab.com/scpcorp/webwallet/-/releases
+[Build Status Badge]: https://gitlab.com/scpcorp/webwallet/badges/main/pipeline.svg
+[Commit History]: https://gitlab.com/scpcorp/webwallet/commits/main
+[GoDoc Badge]: https://godoc.org/gitlab.com/scpcorp/webwallet?status.svg
+[GoDoc SCP Corp Web Wallet]: https://godoc.org/gitlab.com/scpcorp/webwallet
+[Go Report Card Badge]: https://goreportcard.com/badge/gitlab.com/scpcorp/webwallet
+[Go Report Card SCP Corp Web Wallet]: https://goreportcard.com/report/gitlab.com/scpcorp/webwallet
+[License Badge]: https://img.shields.io/badge/License-MIT-brightgreen.svg
+[License Details]: https://gitlab.com/scpcorp/webwallet/-/blob/main/LICENSE
+[ScPrime Documents repository]: https://docs.scpri.me/software/webwallet
+[Go 1.17 or above]: https://golang.org/doc/install
+
