@@ -3,6 +3,7 @@
   <head>
     <title>ScPrime Web Wallet</title>
     <link rel="stylesheet" href="/gui/styles.css">
+    <script type="text/javascript" src="/gui/scripts.js"></script>
     <meta http-equiv="PRAGMA" content="NO-CACHE">
     <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
   </head>
@@ -25,6 +26,11 @@
       </div>
       <div class="middle pad" id="popup_content">
         &UNLOCK_HASH;
+      </div>
+      <div class="middle pad blue-dashed" id="popup_content">
+        <form class="inline-block" action="/?&CACHE_BUSTER;" method="get">
+          <button type="submit">Close</button>
+        </form>
       </div>
     </div>
     <div id="fade" class="fade"></div>
