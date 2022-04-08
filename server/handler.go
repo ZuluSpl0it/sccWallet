@@ -301,6 +301,11 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 		writeError(w, msg, sessionID)
 		return
 	}
+	if len(newPassword) < 8 {
+		msg := msgPrefix + "Password must be at least eight characters long."
+		writeError(w, msg, "")
+		return
+	}
 	if confirmPassword == "" {
 		msg := msgPrefix + "A confirmation password must be provided."
 		writeError(w, msg, sessionID)
@@ -354,6 +359,11 @@ func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httproute
 	}
 	if newPassword == "" {
 		msg := msgPrefix + "A new password must be provided."
+		writeError(w, msg, "")
+		return
+	}
+	if len(newPassword) < 8 {
+		msg := msgPrefix + "Password must be at least eight characters long."
 		writeError(w, msg, "")
 		return
 	}
