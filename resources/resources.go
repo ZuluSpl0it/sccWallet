@@ -73,6 +73,9 @@ var scanningWalletForm string
 //go:embed resources/forms/send_coins.html
 var sendCoinsForm string
 
+//go:embed resources/forms/receive_coins_form.html
+var receiveCoinsForm string
+
 //go:embed resources/forms/unlock_wallet.html
 var unlockWalletForm string
 
@@ -207,6 +210,11 @@ func ScanningWalletForm() string {
 // SendCoinsForm returns the send coins form
 func SendCoinsForm() string {
 	return sendCoinsForm
+}
+
+// ReceiveCoinsForm returns the receive coins form
+func ReceiveCoinsForm() string {
+	return receiveCoinsForm
 }
 
 // UnlockWalletForm returns the unlock wallet form
