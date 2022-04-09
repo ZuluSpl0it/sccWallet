@@ -84,6 +84,9 @@ a:active {
 .display-none {
   display: none;
 }
+.cursor-help {
+  cursor: help;
+}
 .pad {padding: 20px;}
 .pad-col {padding: .5rem;}
 .grid {display:table;width: 100%;}

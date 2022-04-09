@@ -211,9 +211,11 @@ func alertReceiveCoinsHandler(w http.ResponseWriter, req *http.Request, _ httpro
 		writeError(w, msg, sessionID)
 		return
 	}
+	address := strings.ToUpper(fmt.Sprintf("%s", addresses[0]))
 	title := "RECEIVE"
-	msg := strings.ToUpper(fmt.Sprintf("%s", addresses[0]))
-	writeMsg(w, title, msg, sessionID)
+	formHTML := resources.ReceiveCoinsForm()
+	formHTML = strings.Replace(formHTML, "&ADDRESS;", address, -1)
+	writeForm(w, title, formHTML, sessionID)
 }
 
 func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
