@@ -27,6 +27,8 @@ func buildHTTPRoutes() *httprouter.Router {
 		router.GET("/initializeBootstrapper", initializeBootstrapperHandler)
 		router.GET("/skipBootstrapper", skipBootstrapperHandler)
 		router.GET("/initializeConsensusBuilder", initializeConsensusBuilderHandler)
+		router.GET("/configureBrowser", redirect)
+		router.POST("/configureBrowser", configureBrowser)
 	} else {
 		router.GET("/", guiHandler)
 		router.GET("/gui", guiHandler)
