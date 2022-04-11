@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
 	"gitlab.com/scpcorp/webwallet/build"
+	"gitlab.com/scpcorp/webwallet/modules/browserconfig"
+	"gitlab.com/scpcorp/webwallet/modules/launcher"
 	"gitlab.com/scpcorp/webwallet/server"
 
 	spdBuild "gitlab.com/scpcorp/ScPrime/build"
@@ -76,6 +79,16 @@ func startNode(node *node.Node, params *node.NodeParams, loadStart time.Time) {
 	return
 }
 
+func launchGui(params *node.NodeParams) bool {
+	dir, err := filepath.Abs(params.Dir)
+	if err != nil {
+		fmt.Printf("unable to launch GUI: %v\n", err)
+		return false
+	}
+	browser, _ := browserconfig.Browser(dir)
+	return launcher.Launch(browser)
+}
+
 // StartDaemon uses the config parameters to initialize modules and start the web wallet.
 func StartDaemon(nodeParams *node.NodeParams) (err error) {
 	// Record startup time
@@ -113,7 +126,7 @@ func StartDaemon(nodeParams *node.NodeParams) (err error) {
 	}
 
 	// Launch the GUI
-	launch()
+	launchGui(nodeParams)
 
 	if !server.IsRunning() {
 		return nil

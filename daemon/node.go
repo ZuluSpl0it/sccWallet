@@ -13,6 +13,7 @@ import (
 	"gitlab.com/scpcorp/ScPrime/node"
 
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
+	"gitlab.com/scpcorp/webwallet/modules/browserconfig"
 	"gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/server"
 )
@@ -25,6 +26,13 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 		return err
 	}
 	node.Dir = dir
+	// Configure Browser
+	err = initializeBrowser(params)
+	if err != nil {
+		return err
+	} else if browserconfig.Status() == browserconfig.Initialized {
+		return nil
+	}
 	// Bootstrap Consensus Set if necessary
 	bootstrapConsensusSet(params)
 	// Load Gateway.
@@ -57,7 +65,26 @@ func closeNode(node *node.Node, params *node.NodeParams) error {
 	params.CreateGateway = false
 	err := node.Close()
 	bootstrapper.Close()
+	browserconfig.Close()
 	return err
+}
+
+func initializeBrowser(params *node.NodeParams) error {
+	loadStart := time.Now()
+	fmt.Printf("Initializing browser...")
+	time.Sleep(1 * time.Millisecond)
+	browserconfig.Start(params.Dir)
+	loadTime := time.Since(loadStart).Seconds()
+	if browserconfig.Status() == browserconfig.Closed {
+		fmt.Println(" closed after", loadTime, "seconds.")
+		return nil
+	}
+	browser, err := browserconfig.Browser(params.Dir)
+	if err != nil {
+		return err
+	}
+	fmt.Printf(" browser set to %s in %v seconds.\n", browser, loadTime)
+	return nil
 }
 
 func bootstrapConsensusSet(params *node.NodeParams) {
