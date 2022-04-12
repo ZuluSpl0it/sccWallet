@@ -35,6 +35,8 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 	}
 	// Bootstrap Consensus Set if necessary
 	bootstrapConsensusSet(params)
+	// Attach Node To Server
+	server.AttachNode(node, params)
 	// Load Gateway.
 	err = loadGateway(params, node)
 	if err != nil {
@@ -52,7 +54,6 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 	if err != nil {
 		return err
 	}
-	server.AttachNode(node, params)
 	return nil
 }
 
