@@ -89,7 +89,7 @@ func Start(dataDir string) {
 		return
 	}
 	status = Waiting
-	for status != Closed && !exists(browserConfig) {
+	for status == Waiting {
 		time.Sleep(25 * time.Millisecond)
 	}
 	if status == Waiting {

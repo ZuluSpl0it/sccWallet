@@ -27,10 +27,10 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 	}
 	node.Dir = dir
 	// Configure Browser
-	err = initializeBrowser(params)
+	needsShutdown, err := initializeBrowser(params)
 	if err != nil {
 		return err
-	} else if browserconfig.Status() == browserconfig.Initialized {
+	} else if needsShutdown {
 		return nil
 	}
 	// Bootstrap Consensus Set if necessary
@@ -70,7 +70,7 @@ func closeNode(node *node.Node, params *node.NodeParams) error {
 	return err
 }
 
-func initializeBrowser(params *node.NodeParams) error {
+func initializeBrowser(params *node.NodeParams) (bool, error) {
 	loadStart := time.Now()
 	fmt.Printf("Initializing browser...")
 	time.Sleep(1 * time.Millisecond)
@@ -78,14 +78,23 @@ func initializeBrowser(params *node.NodeParams) error {
 	loadTime := time.Since(loadStart).Seconds()
 	if browserconfig.Status() == browserconfig.Closed {
 		fmt.Println(" closed after", loadTime, "seconds.")
-		return nil
+		return true, nil
+	}
+	if browserconfig.Status() == browserconfig.Failed {
+		fmt.Println(" failed after", loadTime, "seconds.")
+		return true, nil
 	}
 	browser, err := browserconfig.Browser(params.Dir)
 	if err != nil {
-		return err
+		fmt.Println(" failed after", loadTime, "seconds.")
+		return true, err
+	}
+	if browserconfig.Status() == browserconfig.Initialized {
+		fmt.Printf(" browser initialized to %s in %v seconds.\n", browser, loadTime)
+		return true, nil
 	}
 	fmt.Printf(" browser set to %s in %v seconds.\n", browser, loadTime)
-	return nil
+	return false, nil
 }
 
 func bootstrapConsensusSet(params *node.NodeParams) {
