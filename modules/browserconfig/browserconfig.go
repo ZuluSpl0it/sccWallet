@@ -14,6 +14,9 @@ const BrowserConfigDir = "browser"
 // Closed is the value that the browser config is set to after it has been closed
 const Closed = "Closed"
 
+// Failed is the value that the browser config is set to if configuration fails
+const Failed = "Failed"
+
 // Waiting is the value that the browser config is set to when it is waiting for input
 const Waiting = "Waiting"
 
@@ -47,9 +50,14 @@ func Configure(dataDir string, browser string) error {
 		err = os.MkdirAll(browserConfigDir, os.ModePerm)
 	}
 	if err != nil {
+		status = Failed
 		return err
 	}
 	err = os.WriteFile(browserConfig, []byte(browser), 0600)
+	if err != nil {
+		status = Failed
+		return err
+	}
 	if browser == "default" {
 		status = Done
 	} else {
