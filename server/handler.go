@@ -706,7 +706,12 @@ func configureBrowser(w http.ResponseWriter, req *http.Request, _ httprouter.Par
 		writeStaticHTML(w, html, "")
 		return
 	}
-	time.Sleep(250 * time.Millisecond)
+	for i := 0; i < 10; i++ {
+		if n != nil {
+			break
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
 	redirect(w, req, nil)
 }
 
@@ -846,8 +851,15 @@ func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.P
 }
 
 func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	for n == nil || n.TransactionPool == nil {
+	for i := 0; i < 10; i++ {
+		if n.TransactionPool != nil {
+			break
+		}
 		time.Sleep(25 * time.Millisecond)
+	}
+	if n.TransactionPool == nil {
+		writeStaticHTML(w, resources.StartingWalletForm(), "")
+		return
 	}
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {

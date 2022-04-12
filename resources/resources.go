@@ -52,6 +52,9 @@ var transactionInputTemplate string
 //go:embed resources/transaction_templates/output_template.html
 var transactionOutputTemplate string
 
+//go:embed resources/forms/starting_wallet.html
+var startingWalletForm string
+
 //go:embed resources/forms/close_alert.html
 var closeAlertForm string
 
@@ -181,6 +184,11 @@ func TransactionInputTemplate() string {
 // TransactionOutputTemplate returns an HTML template
 func TransactionOutputTemplate() string {
 	return transactionOutputTemplate
+}
+
+// StartingWalletForm returns the starting wallet form
+func StartingWalletForm() string {
+	return startingWalletForm
 }
 
 // CloseAlertForm returns the close alert form

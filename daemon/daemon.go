@@ -72,7 +72,6 @@ func startNode(node *node.Node, params *node.NodeParams, loadStart time.Time) {
 		fmt.Println(err)
 		return
 	}
-	server.AttachNode(node, params)
 	// Print a 'startup complete' message.
 	startupTime := time.Since(loadStart)
 	fmt.Printf("Finished full startup in %.3f seconds\n", startupTime.Seconds())
