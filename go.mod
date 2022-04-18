@@ -3,11 +3,11 @@ module gitlab.com/scpcorp/webwallet
 go 1.17
 
 require (
-	github.com/spf13/cobra v1.3.0
+	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
 	gitlab.com/NebulousLabs/errors v0.0.0-20200929122200-06c536cf6975
-	gitlab.com/scpcorp/ScPrime v1.6.0
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	gitlab.com/scpcorp/ScPrime v1.6.2
+	golang.org/x/crypto v0.0.0-20220321153916-2c7772ba3064
 )
 
 require (
@@ -30,7 +30,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/julienschmidt/httprouter v1.3.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
-	github.com/klauspost/reedsolomon v1.9.14 // indirect
+	github.com/klauspost/reedsolomon v1.9.16 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/starius/api2 v0.0.0-20220207151416-38e011ef2fc5 // indirect
-	github.com/starius/flock v0.0.0-20170317185950-31e2b263f285 // indirect
+	github.com/starius/flock v0.0.0-20211126131212-41983f66ca4f // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
@@ -58,16 +58,16 @@ require (
 	gitlab.com/NebulousLabs/monitor v0.0.0-20191205095550-2b0fd3e1012a // indirect
 	gitlab.com/NebulousLabs/persist v0.0.0-20200605115618-007e5e23d877 // indirect
 	gitlab.com/NebulousLabs/ratelimit v0.0.0-20200811080431-99b8f0768b2e // indirect
-	gitlab.com/NebulousLabs/siamux v0.0.0-20210824082138-a4ebafe4b9d9 // indirect
+	gitlab.com/NebulousLabs/siamux v0.0.0-20211123104731-05f52227c71f // indirect
 	gitlab.com/NebulousLabs/threadgroup v0.0.0-20200608151952-38921fbef213 // indirect
-	gitlab.com/scpcorp/merkletree v0.0.0-20211011120743-60ebb43e826e // indirect
+	gitlab.com/scpcorp/merkletree v0.0.0-20220107002940-1145778ea123 // indirect
 	gitlab.com/scpcorp/writeaheadlog v0.0.0-20200814111317-c404cb85e61f // indirect
 	gitlab.com/zer0main/checkport v0.0.0-20211117123614-ea09614c7660 // indirect
 	gitlab.com/zer0main/eventsourcing v0.0.0-20210911223220-4432c7e50e57 // indirect
-	gitlab.com/zer0main/filestorage v0.0.0-20210603210652-2ee6eb57d4a3 // indirect
+	gitlab.com/zer0main/filestorage v0.0.0-20211220182308-d090285b251e // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
+	golang.org/x/net v0.0.0-20220325170049-de3da57026de // indirect
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
