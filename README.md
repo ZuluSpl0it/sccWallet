@@ -1,4 +1,4 @@
-This was created as a learning exerices... Do not use. Visit the original repo for the lastest code.
+This was created as a learning exerice... Do not use. Visit the original repo for the lastest code.
 
 
 # [![ScPrime WebWallet][ScPrime Logo]][ScPrime]
