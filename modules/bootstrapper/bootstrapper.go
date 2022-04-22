@@ -163,7 +163,7 @@ func decompress(src string, dest string) error {
 
 // Returns the size of the latest consensus database in bytes.
 func requestRemoteConsensusSize() (int64, error) {
-	resp, err := http.Head("https://consensus.scpri.me/releases/consensus-latest.zip")
+	resp, err := http.Head("https://consensus.scprime/releases/consensus-latest.zip")
 	if err != nil {
 		return 0, err
 	}
@@ -173,7 +173,7 @@ func requestRemoteConsensusSize() (int64, error) {
 // Downloads the consensus databse to a local file without loading the whole file into memory.
 func consensusDownload(target string) error {
 	// Get the data
-	resp, err := http.Get("https://consensus.scpri.me/releases/consensus-latest.zip")
+	resp, err := http.Get("https://consensus.scprime/releases/consensus-latest.zip")
 	if err != nil {
 		return err
 	}
