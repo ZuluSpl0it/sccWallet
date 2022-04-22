@@ -163,6 +163,15 @@ function shutdownNotice() {
     <div id="fade" class="fade"></div>
   `
 }
+function copyToClipboard(textToCopy) {
+  var temp = document.createElement("input");
+  temp.type = "text";
+  temp.value = textToCopy;
+  document.body.appendChild(temp);
+  temp.select();
+  document.execCommand("Copy");
+  document.body.removeChild(temp);
+}
 refreshBootstrapperProgress()
 refreshConsensusBuilderProgress()
 refreshHeartbeat("")

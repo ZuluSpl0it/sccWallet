@@ -14,6 +14,7 @@ import (
 
 	"gitlab.com/scpcorp/webwallet/build"
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
+	"gitlab.com/scpcorp/webwallet/modules/browserconfig"
 	consensusbuilder "gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/resources"
 
@@ -211,9 +212,11 @@ func alertReceiveCoinsHandler(w http.ResponseWriter, req *http.Request, _ httpro
 		writeError(w, msg, sessionID)
 		return
 	}
+	address := strings.ToUpper(fmt.Sprintf("%s", addresses[0]))
 	title := "RECEIVE"
-	msg := strings.ToUpper(fmt.Sprintf("%s", addresses[0]))
-	writeMsg(w, title, msg, sessionID)
+	formHTML := resources.ReceiveCoinsForm()
+	formHTML = strings.Replace(formHTML, "&ADDRESS;", address, -1)
+	writeForm(w, title, formHTML, sessionID)
 }
 
 func alertRecoverSeedHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -301,6 +304,11 @@ func changeLockHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Pa
 		writeError(w, msg, sessionID)
 		return
 	}
+	if len(newPassword) < 8 {
+		msg := msgPrefix + "Password must be at least eight characters long."
+		writeError(w, msg, "")
+		return
+	}
 	if confirmPassword == "" {
 		msg := msgPrefix + "A confirmation password must be provided."
 		writeError(w, msg, sessionID)
@@ -354,6 +362,11 @@ func initializeSeedHandler(w http.ResponseWriter, req *http.Request, _ httproute
 	}
 	if newPassword == "" {
 		msg := msgPrefix + "A new password must be provided."
+		writeError(w, msg, "")
+		return
+	}
+	if len(newPassword) < 8 {
+		msg := msgPrefix + "Password must be at least eight characters long."
 		writeError(w, msg, "")
 		return
 	}
@@ -685,8 +698,28 @@ func explorerHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Para
 	writeHTML(w, html, sessionID)
 }
 
+func configureBrowser(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	browser := req.FormValue("browser")
+	browserconfig.Configure(build.ScPrimeWebWalletDir(), browser)
+	if browser != "default" {
+		html := resources.BrowserConfigured()
+		writeStaticHTML(w, html, "")
+		return
+	}
+	for i := 0; i < 10; i++ {
+		if n != nil {
+			break
+		}
+		time.Sleep(25 * time.Millisecond)
+	}
+	redirect(w, req, nil)
+}
+
 func initializingNodeHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	if consensusbuilder.Progress() != "" {
+	browserconfig.Initialize()
+	if browserconfig.Status() == browserconfig.Waiting {
+		writeStaticHTML(w, resources.InitializeBrowserForm(), "")
+	} else if consensusbuilder.Progress() != "" {
 		buildingConsensusSetHandler(w, req, nil)
 	} else if bootstrapper.Progress() != "" {
 		bootstrappingHandler(w, req, nil)
@@ -818,8 +851,15 @@ func setTxHistoyPage(w http.ResponseWriter, req *http.Request, resp httprouter.P
 }
 
 func guiHandler(w http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	for n == nil || n.TransactionPool == nil {
+	for i := 0; i < 10; i++ {
+		if n.TransactionPool != nil {
+			break
+		}
 		time.Sleep(25 * time.Millisecond)
+	}
+	if n.TransactionPool == nil {
+		writeStaticHTML(w, resources.StartingWalletForm(), "")
+		return
 	}
 	sessionID := req.FormValue("session_id")
 	if sessionID == "" || !sessionIDExists(sessionID) {

@@ -1,0 +1,31 @@
+<div class='middle pad'>
+  <div id="displayAddress" class='inline-block'>
+    &ADDRESS;
+  </div>
+  <div id="copiedIcon" class='inline-block cursor-help' title='address copied to clipboard'></div>
+</div>
+<div class="middle pad blue-dashed">
+  <div id="copyAddressToClipboard" class="inline-block"></div>
+  <div id="expandAddress" class="inline-block"></div>
+  <div class="inline-block">
+    <form action="/gui?&CACHE_BUSTER;" method="post">
+      <input type="hidden" name="session_id" value="&SESSION_ID;">
+      <button type="submit">Close</button>
+    </form>
+  </div>
+  <script>
+    function addCopiedIcon() {
+      document.getElementById('copiedIcon').innerHTML='🖨️';
+    }
+    function expandAddress() {
+      document.getElementById('displayAddress').innerHTML='&ADDRESS;';
+    }
+    document.getElementById("displayAddress").innerHTML = '&ADDRESS;'.substring(0, 10) + '...' + '&ADDRESS;'.substring('&ADDRESS;'.length - 10);
+    document.getElementById("copyAddressToClipboard").innerHTML = `
+      <button onclick="copyToClipboard('&ADDRESS;');addCopiedIcon()">Copy</button>
+    `
+    document.getElementById("expandAddress").innerHTML = `
+      <button onclick="expandAddress()">Expand</button>
+    `
+  </script>
+</div>

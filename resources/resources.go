@@ -52,6 +52,9 @@ var transactionInputTemplate string
 //go:embed resources/transaction_templates/output_template.html
 var transactionOutputTemplate string
 
+//go:embed resources/forms/starting_wallet.html
+var startingWalletForm string
+
 //go:embed resources/forms/close_alert.html
 var closeAlertForm string
 
@@ -64,6 +67,12 @@ var initializeSeedForm string
 //go:embed resources/forms/initialize_wallet.html
 var initializeWalletForm string
 
+//go:embed resources/forms/initialize_browser.html
+var initializeBrowserForm string
+
+//go:embed resources/forms/browser_configured.html
+var browserConfigured string
+
 //go:embed resources/forms/restore_from_seed.html
 var restoreFromSeedForm string
 
@@ -72,6 +81,9 @@ var scanningWalletForm string
 
 //go:embed resources/forms/send_coins.html
 var sendCoinsForm string
+
+//go:embed resources/forms/receive_coins_form.html
+var receiveCoinsForm string
 
 //go:embed resources/forms/unlock_wallet.html
 var unlockWalletForm string
@@ -174,6 +186,11 @@ func TransactionOutputTemplate() string {
 	return transactionOutputTemplate
 }
 
+// StartingWalletForm returns the starting wallet form
+func StartingWalletForm() string {
+	return startingWalletForm
+}
+
 // CloseAlertForm returns the close alert form
 func CloseAlertForm() string {
 	return closeAlertForm
@@ -194,6 +211,16 @@ func InitializeWalletForm() string {
 	return initializeWalletForm
 }
 
+// InitializeBrowserForm returns the Initialize browser form
+func InitializeBrowserForm() string {
+	return initializeBrowserForm
+}
+
+// BrowserConfigured returns the browser configured alert
+func BrowserConfigured() string {
+	return browserConfigured
+}
+
 // RestoreFromSeedForm returns the restore from seed form
 func RestoreFromSeedForm() string {
 	return restoreFromSeedForm
@@ -207,6 +234,11 @@ func ScanningWalletForm() string {
 // SendCoinsForm returns the send coins form
 func SendCoinsForm() string {
 	return sendCoinsForm
+}
+
+// ReceiveCoinsForm returns the receive coins form
+func ReceiveCoinsForm() string {
+	return receiveCoinsForm
 }
 
 // UnlockWalletForm returns the unlock wallet form

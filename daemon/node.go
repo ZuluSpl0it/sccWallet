@@ -13,6 +13,7 @@ import (
 	"gitlab.com/scpcorp/ScPrime/node"
 
 	"gitlab.com/scpcorp/webwallet/modules/bootstrapper"
+	"gitlab.com/scpcorp/webwallet/modules/browserconfig"
 	"gitlab.com/scpcorp/webwallet/modules/consensesbuilder"
 	"gitlab.com/scpcorp/webwallet/server"
 )
@@ -25,8 +26,17 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 		return err
 	}
 	node.Dir = dir
+	// Configure Browser
+	needsShutdown, err := initializeBrowser(params)
+	if err != nil {
+		return err
+	} else if needsShutdown {
+		return nil
+	}
 	// Bootstrap Consensus Set if necessary
 	bootstrapConsensusSet(params)
+	// Attach Node To Server
+	server.AttachNode(node, params)
 	// Load Gateway.
 	err = loadGateway(params, node)
 	if err != nil {
@@ -44,7 +54,6 @@ func loadNode(node *node.Node, params *node.NodeParams) error {
 	if err != nil {
 		return err
 	}
-	server.AttachNode(node, params)
 	return nil
 }
 
@@ -57,7 +66,35 @@ func closeNode(node *node.Node, params *node.NodeParams) error {
 	params.CreateGateway = false
 	err := node.Close()
 	bootstrapper.Close()
+	browserconfig.Close()
 	return err
+}
+
+func initializeBrowser(params *node.NodeParams) (bool, error) {
+	loadStart := time.Now()
+	fmt.Printf("Initializing browser...")
+	time.Sleep(1 * time.Millisecond)
+	browserconfig.Start(params.Dir)
+	loadTime := time.Since(loadStart).Seconds()
+	if browserconfig.Status() == browserconfig.Closed {
+		fmt.Println(" closed after", loadTime, "seconds.")
+		return true, nil
+	}
+	if browserconfig.Status() == browserconfig.Failed {
+		fmt.Println(" failed after", loadTime, "seconds.")
+		return true, nil
+	}
+	browser, err := browserconfig.Browser(params.Dir)
+	if err != nil {
+		fmt.Println(" failed after", loadTime, "seconds.")
+		return true, err
+	}
+	if browserconfig.Status() == browserconfig.Initialized {
+		fmt.Printf(" browser initialized to %s in %v seconds.\n", browser, loadTime)
+		return true, nil
+	}
+	fmt.Printf(" browser set to %s in %v seconds.\n", browser, loadTime)
+	return false, nil
 }
 
 func bootstrapConsensusSet(params *node.NodeParams) {
